@@ -160,6 +160,47 @@ class MPModel(object_base.ObjectBase):
     cons.set_index(self.get_num_constraints())
     self._cons[cons.get_name()] = cons
     return cons
+    
+  def make_simple_model(self, shared_variables=None, solution=None, 
+  											NumVariables=0):
+    new_model = MPModel()
+    new_model.set_objective(self.get_objective()._expr, True)
+    constr = self.get_constraints()  
+    m_vars = self.get_variables()  
+    new_rows_rhs = []#constr[0].get_rhs()
+    variables_names = solution.get_variables_names()
+    ii = 0
+    for c in constr:
+      new_rows_rhs.append(c.get_rhs())
+      for i in shared_variables:
+        if i in variables_names and i in m_vars: # check
+          print i
+          new_rows_rhs[ii] -= c.get_coefficient(self.get_variable_by_name(i))
+      ii = ii + 1
+    '''ii = 0
+    while ii < solution.get_num_variables():
+    	print variables_names[ii], variables_values[ii]
+    	ii = ii + 1'''
+    new_coeffs = []
+    ii = 0
+    while ii < len(constr):
+      tmp_coeffs = []
+      jj = 0
+      while jj < NumVariables:
+        tmp_coeffs.append(0)
+        jj = jj + 1
+      new_coeffs.append(tmp_coeffs)
+      ii = ii + 1
+    ii = 0
+    while ii < len(constr):
+      for v in m_vars:
+        if not v.get_name() in shared_variables:
+          new_coeffs[ii][v.get_index()] = constr[ii].get_coefficient(v)
+      ii = ii + 1
+    new_model.set_constraints_from_scratch(new_coeffs,
+    [constr[i].get_sense() for i in range(len(constr))], new_rows_rhs, [constr[i].get_name() for i in range(len(constr))])
+    #new_model.pprint()
+    return new_model # self 
 
   def add_variables(self, variables):
     '''Adds variables from iterable `variables`.
@@ -230,6 +271,13 @@ class MPModel(object_base.ObjectBase):
       instances.
     '''
     return self._cons.values()
+    
+  #new
+  def get_constraints_names(self):
+    constraints_names = []
+    for i in self._cons:
+      constraints_names.append(i)
+    return constraints_names
 
   def get_name(self):
     '''Returns the model name. Returns :attr:`default_model_name` if name wasn't
@@ -276,6 +324,13 @@ class MPModel(object_base.ObjectBase):
               matrix.
     '''
     return self._vars.values()
+  
+  #new
+  def get_variables_names(self):
+    variables_names = []
+    for i in self._vars: 
+      variables_names.append(i)
+    return variables_names
 
   def get_variable_by_name(self, name):
     '''Returns variable by name or `None` if such variable cannot be found.

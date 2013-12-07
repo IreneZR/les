@@ -48,10 +48,13 @@ class MPConstraint(object_base.ObjectBase):
   def get_name(self):
     '''Returns constraint name.'''
     return self._name
-
+    
+  #new
   def get_rhs(self):
     '''Returns constraint right-hand side value.'''
-    return float(self._expr.rhs or self._expr.lhs)
+    #print self._expr.rhs, self._expr.lhs
+    return float(self._expr.rhs)
+    #return float(self._expr.rhs or self._expr.lhs)
 
   def get_sense(self):
     return self._expr.rel_op

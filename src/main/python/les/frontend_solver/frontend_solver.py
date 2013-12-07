@@ -33,6 +33,7 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
 
   def __init__(self):
     self._model = None
+    self._with_oracle = None
     self._optimization_params = None
     self._executor = None
     self._pipeline = None
@@ -61,7 +62,7 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
     request.set_model(mp_model_parameters.build(self._model))
     request.set_solver_id(self._optimization_params.default_backend_solver)
     response = self._executor.execute(request)
-    self._set_solution(response.get_solution())
+    return self._set_solution(response.get_solution())
 
   def get_model(self):
     '''Returns model solved by this solver.
@@ -78,7 +79,7 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
                       'linear programming problems.')
     self._model = model
 
-  def solve(self, params=None):
+  def solve(self, params=None, with_oracle=True):
     if not self._model:
       raise Error()
     if params and not isinstance(params, frontend_solver_pb2.OptimizationParameters):
@@ -87,6 +88,7 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
       params = frontend_solver_pb2.OptimizationParameters()
     self._finalize_optimization_parameters(params)
     self._optimization_params = params
+    self._with_oracle = with_oracle    
     logging.info('Optimize model %s with %d rows and %d columns.',
                  self._model.get_name(), self._model.get_num_constraints(),
                  self._model.get_num_variables())
@@ -99,7 +101,13 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
       logging.exception('Decomposition has been failed.')
       return
     logging.info('Model has been successfully decomposed.')
-    tree = decomposer.get_decomposition_tree()
+    #############################################
+    if with_oracle:
+      old_tree = decomposer.get_decomposition_tree()
+      tree = decomposer.modify(self._with_oracle)
+    else:
+      tree = decomposer.get_decomposition_tree()
+    #############################################
     if not self._process_decomposition_tree(tree):
       return
     self._executor = executor_manager.get_instance_of(params.executor)
@@ -123,12 +131,65 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
     except Exception, e:
       logging.exception('Pipeline failed.')
       return
-    self._set_solution(solution_table.get_solution())
+    #new
+    solution_table.dump()
+    print "Knapsack solution:"
+    for i in solution_table.get_solution().get_variables_names():
+      print i,
+    print ""
+    #############################################
+    if with_oracle:
+      for i in old_tree.get_nodes():
+        i.get_model().pprint()  
+        simple_model = i.get_model().make_simple_model(i.get_shared_variables(),
+        										 solution_table.get_solution(), 
+        										 self._model.get_num_variables())
+        #simple_model = i.get_model()
+        simple_model.pprint()  
+        
+        fsolver = FrontendSolver()
+        fsolver.load_model(simple_model)
+        fsolver._optimization_params = params
+        fsolver._finalize_optimization_parameters(params)
+        fsolver._executor = executor_manager.get_instance_of(params.executor)
+        simple_solution = fsolver._solve_single_model()
+        
+        print "Solution with oracle:"
+        for s in simple_solution.get_variables_names():
+          print s,
+        print ""
+ 
+        '''request = self._executor.build_request()
+        request.set_model(mp_model_parameters.build(simple_model))
+        request.set_solver_id(self._optimization_params.default_backend_solver)
+        response = self._executor.execute(request)'''
+        #simple_solution = response.get_solution()
+        
+        for v in simple_model.get_variables():
+          var_name = v.get_name()
+          if var_name in i.get_shared_variables():
+            names = solution_table.get_solution().get_variables_names()
+          else:
+            names = simple_solution.get_variables_names()
+          if var_name in names:
+            self._set_solution_of_vars(var_name, 1.0)       
+    #############################################  
+    if not with_oracle:
+      self._set_solution(solution_table.get_solution())
+      
+  #new    
+  def _set_solution_of_vars(self, variable_name, variable_value):
+    var = self._model.get_variable_by_name(variable_name)
+    var.set_value(variable_value)
 
   def _set_solution(self, solution):
     objective = self._model.get_objective()
     objective.set_value(solution.get_objective_value())
     # TODO(d2rk): set only triggered variables.
+    print "\n_set_solution"
     for var in self._model.get_variables():
       if var.get_name() in solution.get_variables_names():
         var.set_value(solution.get_variable_value_by_name(var.get_name()))
+        print var.get_name(), var.get_value()
+    print ""
+    return solution
