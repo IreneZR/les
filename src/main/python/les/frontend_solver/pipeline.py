@@ -73,7 +73,6 @@ class Pipeline(object):
       self._executor.execute(request)
 
   def process_response(self, response):
-    print response.get_id(), "**************************"
     cxt = self._frozen_contexts.pop(response.get_id())
     solution = response.get_solution()
     logging.debug('Process %s solution produced by %d with status %d',

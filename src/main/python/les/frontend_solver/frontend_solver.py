@@ -132,20 +132,25 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
       logging.exception('Pipeline failed.')
       return
     #new
-    solution_table.dump()
+    #solution_table.dump()
     print "Knapsack solution:"
+    print solution_table.get_solution().get_objective_value()
     for i in solution_table.get_solution().get_variables_names():
       print i,
-    print ""
+    print "\n"
     #############################################
     if with_oracle:
       for i in old_tree.get_nodes():
+        print "Prev model:"
         i.get_model().pprint()  
+        print ""
         simple_model = i.get_model().make_simple_model(i.get_shared_variables(),
         										 solution_table.get_solution(), 
         										 self._model.get_num_variables())
         #simple_model = i.get_model()
-        simple_model.pprint()  
+        print "Simple model:"
+        simple_model.pprint()
+        print ""
         
         fsolver = FrontendSolver()
         fsolver.load_model(simple_model)
@@ -155,9 +160,10 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
         simple_solution = fsolver._solve_single_model()
         
         print "Solution with oracle:"
+        print simple_solution.get_objective_value()
         for s in simple_solution.get_variables_names():
           print s,
-        print ""
+        print "\n"
  
         '''request = self._executor.build_request()
         request.set_model(mp_model_parameters.build(simple_model))
@@ -184,12 +190,9 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
 
   def _set_solution(self, solution):
     objective = self._model.get_objective()
-    objective.set_value(solution.get_objective_value())
+    #objective.set_value(solution.get_objective_value())
     # TODO(d2rk): set only triggered variables.
-    print "\n_set_solution"
     for var in self._model.get_variables():
       if var.get_name() in solution.get_variables_names():
         var.set_value(solution.get_variable_value_by_name(var.get_name()))
-        print var.get_name(), var.get_value()
-    print ""
     return solution

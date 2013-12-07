@@ -168,13 +168,15 @@ class MPModel(object_base.ObjectBase):
     constr = self.get_constraints()  
     m_vars = self.get_variables()  
     new_rows_rhs = []#constr[0].get_rhs()
-    variables_names = solution.get_variables_names()
+    variables_names = solution.get_variables_names()    
     ii = 0
     for c in constr:
+      constr_var_names = []
+      for i in c.get_variables():
+        constr_var_names.append(i.get_name())
       new_rows_rhs.append(c.get_rhs())
       for i in shared_variables:
-        if i in variables_names and i in m_vars: # check
-          print i
+        if i in variables_names and i in constr_var_names: # check
           new_rows_rhs[ii] -= c.get_coefficient(self.get_variable_by_name(i))
       ii = ii + 1
     '''ii = 0
