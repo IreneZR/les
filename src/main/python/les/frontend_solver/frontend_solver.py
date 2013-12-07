@@ -139,6 +139,7 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
       print i,
     print "\n"
     #############################################
+    result_sol = 0
     if with_oracle:
       for i in old_tree.get_nodes():
         print "Prev model:"
@@ -159,6 +160,7 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
         fsolver._executor = executor_manager.get_instance_of(params.executor)
         simple_solution = fsolver._solve_single_model()
         
+        result_sol += simple_solution.get_objective_value()
         print "Solution with oracle:"
         print simple_solution.get_objective_value()
         for s in simple_solution.get_variables_names():
@@ -180,6 +182,7 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
           if var_name in names:
             self._set_solution_of_vars(var_name, 1.0)       
     #############################################  
+    print "Result = ", result_sol, "\n"
     if not with_oracle:
       self._set_solution(solution_table.get_solution())
       
