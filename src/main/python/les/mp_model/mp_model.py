@@ -164,7 +164,14 @@ class MPModel(object_base.ObjectBase):
   def make_simple_model(self, shared_variables=None, solution=None, 
   											NumVariables=0):
     new_model = MPModel()
-    new_model.set_objective(self.get_objective()._expr, True)
+    coefs, names = [], []
+    for v in self.get_variables():
+      if v.get_name() in shared_variables:
+        continue
+      coefs.append(self.get_objective().get_coefficient(v))
+      names.append(v.get_name())
+    new_model.set_objective_from_scratch(coefs, names)
+    #new_model.set_objective(self.get_objective()._expr, True)
     constr = self.get_constraints()  
     m_vars = self.get_variables()  
     new_rows_rhs = []#constr[0].get_rhs()
@@ -183,24 +190,24 @@ class MPModel(object_base.ObjectBase):
     while ii < solution.get_num_variables():
     	print variables_names[ii], variables_values[ii]
     	ii = ii + 1'''
+ 
     new_coeffs = []
-    ii = 0
-    while ii < len(constr):
+    for ii in range(len(constr)):
       tmp_coeffs = []
-      jj = 0
-      while jj < NumVariables:
-        tmp_coeffs.append(0)
-        jj = jj + 1
-      new_coeffs.append(tmp_coeffs)
-      ii = ii + 1
-    ii = 0
-    while ii < len(constr):
+      constr_var_names = []
+      for v in constr[ii].get_variables():
+        constr_var_names.append(v.get_name())
       for v in m_vars:
-        if not v.get_name() in shared_variables:
-          new_coeffs[ii][v.get_index()] = constr[ii].get_coefficient(v)
-      ii = ii + 1
-    new_model.set_constraints_from_scratch(new_coeffs,
-    [constr[i].get_sense() for i in range(len(constr))], new_rows_rhs, [constr[i].get_name() for i in range(len(constr))])
+        name = v.get_name()
+        if not name in shared_variables: 
+          if name in constr_var_names:
+            tmp_coeffs.append(constr[ii].get_coefficient(v))
+          else:
+            tmp_coeffs.append(0)
+      new_coeffs.append(tmp_coeffs)
+    new_model.set_constraints_from_scratch(new_coeffs, [constr[i].get_sense() 
+    for i in range(len(constr))], new_rows_rhs, [constr[i].get_name() 
+    for i in range(len(constr))])
     #new_model.pprint()
     return new_model # self 
 
