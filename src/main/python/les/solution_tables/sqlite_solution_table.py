@@ -154,10 +154,19 @@ class SQLiteSolutionTable(db_solution_table_base.DBSolutionTableBase):
     conn = self._data_store.get_connection()
     result = conn.execute('SELECT MAX(value), true_vars FROM %s' %
                           self._decomposition_tree.get_root())
+    self.dump()
+    print result.fetchall()
+    exit(0)
     try:
       objective_value, true_vars = result.fetchone()
     except Exception:
       raise Error()
+    print result.fetchone()  
+    print "SQLITE_SOLUTION_TABLE get_solution true_vars"
+    for tv in true_vars:
+      print tv,
+    print objective_value, true_vars
+    self.dump()
     solution = mp_solution.MPSolution()
     solution.set_objective_value(objective_value)
     true_vars = json.loads(true_vars)

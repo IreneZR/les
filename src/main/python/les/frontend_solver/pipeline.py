@@ -71,6 +71,12 @@ class Pipeline(object):
       request.set_solver_id(cxt.solver_id_stack[0])
       self._frozen_contexts[name] = cxt
       self._executor.execute(request)
+    '''self._solution_table.dump()
+    print ""
+    sol = self._solution_table.get_solution()
+    for v in sol.get_variables_names():
+      print v,
+    print ""'''
 
   def process_response(self, response):
     cxt = self._frozen_contexts.pop(response.get_id())

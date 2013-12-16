@@ -58,7 +58,9 @@ class Optimize(command_base.CommandBase):
   )
 
   def run(self):
+    print('=)')
     model = mp_model.build(self._args.file)
+    print('=)))')
     optimization_params = frontend_solver_pb2.OptimizationParameters()
     optimization_params.decomposer = self._args.decomposer_id
     optimization_params.executor = self._args.executor_id
