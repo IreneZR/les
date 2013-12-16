@@ -63,6 +63,7 @@ class MPModelBuilder(object):
                     % ext)
       decoder = decoder_class()
       decoder.decode(stream)
+      print decoder
       stream.close()
       return cls.build(decoder)
     else:

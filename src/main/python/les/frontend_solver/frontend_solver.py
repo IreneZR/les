@@ -133,14 +133,14 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
       return
     #new
     #solution_table.dump()
-    print "Knapsack solution:"
-    print solution_table.get_solution().get_objective_value()
-    for i in solution_table.get_solution().get_variables_names():
-      print i,
-    print "\n"
     #############################################
-    result_sol = 0
     if with_oracle:
+      print "Knapsack solution:"
+      print solution_table.get_solution().get_objective_value()
+      for i in solution_table.get_solution().get_variables_names():
+        print i,
+      print "\n"
+      result_sol = 0
       for i in old_tree.get_nodes():
         print "Prev model:"
         i.get_model().pprint()  
@@ -180,9 +180,9 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
           else:
             names = simple_solution.get_variables_names()
           if var_name in names:
-            self._set_solution_of_vars(var_name, 1.0)       
+            self._set_solution_of_vars(var_name, 1.0)  
+      print "Result = ", result_sol, "\n"     
     #############################################  
-    print "Result = ", result_sol, "\n"
     if not with_oracle:
       self._set_solution(solution_table.get_solution())
       
@@ -193,7 +193,7 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
 
   def _set_solution(self, solution):
     objective = self._model.get_objective()
-    #objective.set_value(solution.get_objective_value())
+    objective.set_value(solution.get_objective_value())
     # TODO(d2rk): set only triggered variables.
     for var in self._model.get_variables():
       if var.get_name() in solution.get_variables_names():
