@@ -16,42 +16,44 @@
 
 from scipy import sparse
 
-from les import mp_model
+from les.mp_model import mp_model_builder
 from les.graphs import decomposition_tree
 from les.utils import unittest
+
 
 class DecompositionTreeTest(unittest.TestCase):
 
   def test_dependencies(self):
-    model = mp_model.build()
-    x1 = model.add_binary_variable('x1')
-    x2 = model.add_binary_variable('x2')
-    x3 = model.add_binary_variable('x3')
-    x4 = model.add_binary_variable('x4')
-    x5 = model.add_binary_variable('x5')
-    x6 = model.add_binary_variable('x6')
-    x7 = model.add_binary_variable('x7')
-    x8 = model.add_binary_variable('x8')
-    x9 = model.add_binary_variable('x9')
-    model.set_constraints(
-      [2. * x1 + 3. * x2 + 4. * x3 + 1. * x4 <= 7,
-       1. * x1 + 2. * x2 + 3. * x3 + 2. * x4 <= 6,
-       2. * x3 + 1. * x4 + 3. * x5 + 4. * x6 + 2. * x7 <= 9,
-       2. * x3 + 1. * x4 + 1. * x5 + 2. * x6 + 5. * x7 <= 7,
-       2. * x7 + 1. * x8 + 2. * x9 <= 3,
-       3. * x7 + 4. * x8 + 1. * x9 <= 5])
-    submodel1 = mp_model.build(
-      8 * x1 + 2 * x2 + 5 * x3 + 5 * x4,
-      [2. * x1 + 3. * x2 + 4. * x3 + 1. * x4 <= 7,
-       1. * x1 + 2. * x2 + 3. * x3 + 2. * x4 <= 6])
-    submodel2 = mp_model.build(
-      5 * x3 + 5 * x4 + 8 * x5 + 3 * x6 + 9 * x7,
-      [2. * x3 + 1. * x4 + 3. * x5 + 4. * x6 + 2. * x7 <= 9,
-       2. * x3 + 1. * x4 + 1. * x5 + 2. * x6 + 5. * x7 <= 7])
-    submodel3 = mp_model.build(
-      9 * x7 + 7 * x8 + 6 * x9,
-      [2. * x7 + 1. * x8 + 2. * x9 <= 3,
-       3. * x7 + 4. * x8 + 1. * x9 <= 5])
+    builder = mp_model_builder.MPModelBuilder()
+    x1, x2, x3, x4, x5, x6, x7, x8, x9 = (builder.add_binary_variable("x%d" % i)
+                                          for i in range(9))
+    builder.maximize(8 * x1 + 2 * x2 + 5 * x3 + 5 * x4 + 8 * x5 + 3 * x6
+                     + 9 * x7 + 7 * x8 + 6 * x9)
+    builder.set_constraints([2 * x1 + 3 * x2 + 4 * x3 + x4 <= 7,
+                             x1 + 2 * x2 + 3 * x3 + 2 * x4 <= 6,
+                             x3 + 4 * x4 + 3 * x5 + 4 * x6 + 2 * x7 <= 9,
+                             2 * x3 + x4 + x5 + 2 * x6 + 5 * x7 <= 7,
+                             2 * x7 + x8 + 2 * x9 <= 3,
+                             3 * x7 + 4 * x8 + x9 <= 5])
+    model = builder.build()
+    builder = mp_model_builder.MPModelBuilder()
+    x1, x2, x3, x4 = (builder.add_binary_variable("x%d" % i) for i in range(4))
+    builder.set_objective(8 * x1 + 2 * x2 + 5 * x3 + 5 * x4)
+    builder.set_constraints([2. * x1 + 3. * x2 + 4. * x3 + 1. * x4 <= 7,
+                             1. * x1 + 2. * x2 + 3. * x3 + 2. * x4 <= 6])
+    submodel1 = builder.build()
+    builder = mp_model_builder.MPModelBuilder()
+    x3, x4, x5, x6, x7 = (builder.add_binary_variable("x%d" % i) for i in range(3, 8))
+    builder.set_objective(5 * x3 + 5 * x4 + 8 * x5 + 3 * x6 + 9 * x7)
+    builder.set_constraints([2. * x3 + 1. * x4 + 3. * x5 + 4. * x6 + 2. * x7 <= 9,
+                             2. * x3 + 1. * x4 + 1. * x5 + 2. * x6 + 5. * x7 <= 7])
+    submodel2 = builder.build()
+    builder = mp_model_builder.MPModelBuilder()
+    x7, x8, x9 = (builder.add_binary_variable("x%d" % i) for i in range(7, 10))
+    builder.set_objective(9 * x7 + 7 * x8 + 6 * x9)
+    builder.set_constraints([2. * x7 + 1. * x8 + 2. * x9 <= 3,
+                             3. * x7 + 4. * x8 + 1. * x9 <= 5])
+    submodel3 = builder.build()
     tree = decomposition_tree.DecompositionTree(model=model)
     tree.add_node(submodel3)
     tree.set_root(submodel3)
@@ -69,6 +71,7 @@ class DecompositionTreeTest(unittest.TestCase):
                       node2.get_local_variables())
     tree.add_edge(submodel2, submodel1, shared_variables=[u'x3', u'x4'])
     self.assert_equal(set([u'x5', u'x6']), node2.get_local_variables())
+
 
 if __name__ == '__main__':
   unittest.main()
