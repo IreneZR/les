@@ -17,12 +17,15 @@ import sys
 from les.utils import logging
 from les.drivers import drivers_pb2
 from les.drivers.local_elimination_driver import LocalEliminationDriver
+from les.drivers.oracle_driver.oracle_driver import OracleDriver
 
 
 LOCAL_ELIMINATION_DRIVER = drivers_pb2.LOCAL_ELIMINATION_DRIVER
+ORACLE_DRIVER = LOCAL_ELIMINATION_DRIVER + 1
 
 _DRIVERS_TABLE = {
-  LOCAL_ELIMINATION_DRIVER: LocalEliminationDriver
+  LOCAL_ELIMINATION_DRIVER: LocalEliminationDriver,
+  ORACLE_DRIVER: OracleDriver
 }
 
 
