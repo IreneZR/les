@@ -49,7 +49,10 @@ Once the model has been decomposed, its
 #
 
 from les.mp_model import MPModel
+from les.mp_model import knapsack_model
+from les.mp_model.mp_model_builder import mp_model_builder
 from les.decomposers import decomposer_base
+from les.graphs.decomposition_tree import Node
 from les.graphs.decomposition_tree import DecompositionTree
 from les.utils import logging
 
@@ -73,6 +76,49 @@ class FinkelsteinQBDecomposer(decomposer_base.DecomposerBase):
     self._u = []
     self._s = []
     self._m = []
+
+  #new
+  def modify(self): 
+    list_of_models = self._decomposition_tree.get_models()
+    fbool = True
+    print dir(MPModel) #help
+    for m in list_of_models:
+      kmodel = knapsack_model.KnapsackModel(m)
+      kmodel.mp_model_to_knapsack(m)
+      #kmodel.rows_senses = [m.rows_senses[0]]
+      #kmodel.rows_coefficients = m.rows_coefficients.sum(0)
+      #kmodel.rows_rhs = [sum(m.rows_rhs)]
+      m.pprint()
+      print "NEW MODEL"
+      print len(kmodel.get_profits())
+      new_model = mp_model_builder.MPModelBuilder().build_from_scratch(kmodel.get_profits(), [kmodel.get_weights()], ['L'], [kmodel.get_max_weight()], ["new_model"], [0 for j in range(m.get_num_columns())], [1 for j in range(m.get_num_columns())], m.columns_names)
+      new_model.set_objective(kmodel.get_profits())
+      print "LEN", len(new_model.objective_coefficients)
+      new_model.set_name(m.get_name())
+      new_model.pprint()
+      new_vars_names = []
+      #new_vars_names = new_model.get_variables()
+      if fbool:
+        new_tree = DecompositionTree(self._model)
+        root = Node(new_model)
+        new_tree.set_root(root)
+        new_tree.add_node(new_model)
+        fbool = False
+      else: 
+        shared_vars_names = []
+        prev_vars = prev_model.columns_names
+        new_vars_names = new_model.columns_names
+        for p in prev_vars:
+          if p in new_vars_names:
+            shared_vars_names.append(p)
+        '''print len(shared_vars_name)
+        for i in shared_vars_name:
+          print i,
+        print "=))))))))))))))))))"'''
+        new_tree.add_node(new_model)
+        new_tree.add_edge(prev_model, new_model, shared_vars_names)
+      prev_model = new_model
+    return new_tree # self._decomposition_tree
 
   def _build_decomposition_tree(self):
     # TODO: fix this. Add default empty separators set.

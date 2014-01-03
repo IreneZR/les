@@ -63,6 +63,52 @@ class MPModel(object_base.ObjectBase):
             (self.__class__.__name__, self.get_num_rows(),
              self.get_num_columns(), self.maximization()))
 
+  def make_simple_model(self, shared_variables=None, solution=None, 
+  											NumVariables=0):
+    new_model = MPModel()
+    new_model.set_objective(self.get_objective()._expr, True)
+    constr = self.get_constraints()  
+    m_vars = self.get_variables()  
+    new_rows_rhs = []#constr[0].get_rhs()
+    variables_names = solution.get_variables_names()    
+    ii = 0
+    for c in constr:
+      constr_var_names = []
+      for i in c.get_variables():
+        constr_var_names.append(i.get_name())
+      new_rows_rhs.append(c.get_rhs())
+      for i in shared_variables:
+        if i in variables_names and i in constr_var_names: # check
+          new_rows_rhs[ii] -= c.get_coefficient(self.get_variable_by_name(i))
+      ii = ii + 1
+    '''ii = 0
+    while ii < solution.get_num_variables():
+    	print variables_names[ii], variables_values[ii]
+    	ii = ii + 1'''
+    new_coeffs = []
+    ii = 0
+    while ii < len(constr):
+      tmp_coeffs = []
+      jj = 0
+      while jj < NumVariables:
+        tmp_coeffs.append(0)
+        jj = jj + 1
+      new_coeffs.append(tmp_coeffs)
+      ii = ii + 1
+    ii = 0
+    while ii < len(constr):
+      for v in m_vars:
+        if not v.get_name() in shared_variables:
+          new_coeffs[ii][v.get_index()] = constr[ii].get_coefficient(v)
+      ii = ii + 1
+    new_model.set_constraints_from_scratch(new_coeffs,
+    [constr[i].get_sense() for i in range(len(constr))], new_rows_rhs, [constr[i].get_name() for i in range(len(constr))])
+    #new_model.pprint()
+    return new_model # self 
+    
+  #def mp_model_to_knapsack(self):
+    
+
   def get_objective_value(self):
     return self.objective_value
 
@@ -110,11 +156,14 @@ class MPModel(object_base.ObjectBase):
     return self
 
   def set_objective(self, coefficients, name=None):
+    print "Aaaaaaaaaaaaaa!!!!!!!!!!!!"
     if isinstance(coefficients, tuple):
       self.objective_coefficients = list(coefficients)
+    print "Bbbbbbbbbbbbbb!!!!!!!!!!!!"
     if not isinstance(coefficients, list):
       raise TypeError("coefficients: %s" % coefficients)
     self.objective_coefficients = coefficients
+    print len(coefficients)
     self.objective_name = name
     return self
 
@@ -176,6 +225,18 @@ class MPModel(object_base.ObjectBase):
       if not v[i] <= self.rows_rhs[i]:
         return False
     return True
+    
+  def get_variables(self):
+    '''Return a list of presented variables.
+
+    .. note:: The variables come in order they are stored in the constraint
+              matrix.
+    '''
+    return self.columns_values
+  
+  #new
+  def get_variables_names(self):
+    return self.columns_names
 
   def get_status(self):
     return None

@@ -35,7 +35,13 @@ class KnapsackModel(mp_model.MPModel):
 
   def get_max_weight(self):
     return self.rows_rhs[0]
-
+  
+  def mp_model_to_knapsack(self, model=None):
+    self.objective_coefficients = model.get_objective_coefficients()
+    self.rows_senses = [model.rows_senses[0]]
+    self.rows_coefficients = model.rows_coefficients.sum(0)
+    self.rows_rhs = [sum(model.rows_rhs)]
+    return self
 
 KnapsackModel.get_profits = KnapsackModel.get_objective_coefficients
 KnapsackModel.get_num_items = KnapsackModel.get_num_columns

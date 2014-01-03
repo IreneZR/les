@@ -20,6 +20,7 @@ from les import solution_tables
 from les.mp_model import mp_solution
 from les.drivers import driver_base
 from les.drivers.oracle_driver import search_tree
+from les import executors as executor_manager
 from les.utils import logging
 
 
@@ -50,9 +51,11 @@ class OracleDriver(driver_base.DriverBase):
     if not model.is_binary():
       raise TypeError("Optimization can be applied only to binary integer "
                       "linear programming problems.")
+    self._model = model
     self._pipeline = pipeline
     self._optimization_params = optimization_parameters
     self._driver_params = optimization_parameters.driver.oracle_driver_parameters
+    self._executor = executor_manager.get_instance_of(optimization_parameters.executor.executor, self._pipeline)
     self._decomposer = decomposers.get_instance_of(self._driver_params.decomposer, model)
     logging.info("Decomposer: %s" % self._decomposer.__class__.__name__)
     self._solution_table = solution_tables.get_instance_of(self._driver_params.solution_table)
@@ -67,11 +70,11 @@ class OracleDriver(driver_base.DriverBase):
 
   def _trivial_case(self):
     request = self._executor.build_request()
-    request.set_model(mp_model_parameters.build(self._model))
+    request.set_model(self._model)
     request.set_solver_id(self._optimization_params.driver.default_backend_solver)
-    response = self._pipeline.put_request(request)
-    self._set_solution(response.get_solution())
-    raise NotImplementedError()
+    response = self._executor.execute(request)
+    return self._set_solution(response.get_solution())
+    #raise NotImplementedError()
 
   def _process_decomposition_tree(self, tree):
     # TODO(d2rk): merge nodes if necessary.
@@ -99,7 +102,63 @@ class OracleDriver(driver_base.DriverBase):
       return self._trivial_case()
     self._search_tree = search_tree.SearchTree(tree)
     self._solution_table.set_decomposition_tree(tree)
+    old_tree = tree
+    tree = self._decomposer.modify()
     self.run()
+    result_sol = 0
+    for i in old_tree.get_nodes():
+      print "Prev model:"
+      i.get_model().pprint()  
+      print ""
+      simple_model = i.get_model().make_simple_model(i.get_shared_variables(),
+      										 self._solution_table.get_solution(), 
+      										 self._model.get_num_variables())
+      #simple_model = i.get_model()
+      print "Simple model:"
+      simple_model.pprint()
+      print ""
+      
+      odriver = OracleDriver()
+      request = self._executor.build_request()
+      request.set_model(mp_model_parameters.build(simple_model))
+      request.set_solver_id(self._optimization_params.driver.default_backend_solver)
+      response = self._pipeline.put_request(request)
+      odriver._set_solution(response.get_solution())  
+      simple_solution = odriver.get_solution()      
+      '''fsolver = FrontendSolver()
+      fsolver.load_model(simple_model)
+      fsolver._optimization_params = params
+      fsolver._finalize_optimization_parameters(params)
+      fsolver._executor = executor_manager.get_instance_of(params.executor)
+      simple_solution = fsolver._solve_single_model()'''
+        
+      result_sol += simple_solution.get_objective_value()
+      print "Solution with oracle:"
+      print simple_solution.get_objective_value()
+      for s in simple_solution.get_variables_names():
+        print s,
+      print "\n"
+ 
+      '''request = self._executor.build_request()
+      request.set_model(mp_model_parameters.build(simple_model))
+      request.set_solver_id(self._optimization_params.default_backend_solver)
+      response = self._executor.execute(request)'''
+      #simple_solution = response.get_solution()
+        
+      for v in simple_model.get_variables():
+        var_name = v.get_name()
+        if var_name in i.get_shared_variables():
+          names = solution_table.get_solution().get_variables_names()
+        else:
+          names = simple_solution.get_variables_names()
+        if var_name in names:
+          self._set_solution_of_vars(var_name, 1.0)       
+    #############################################  
+    print "Result = ", result_sol, "\n"
+
+  def _set_solution_of_vars(self, variable_name, variable_value):
+    var = self._model.get_variable_by_name(variable_name)
+    var.set_value(variable_value)
 
   def run(self):
     while True:
@@ -157,3 +216,12 @@ class OracleDriver(driver_base.DriverBase):
 
   def get_solution(self):
     return self._solution_table.get_solution()
+    
+  def _set_solution(self, solution):
+    objective = self._model.objective_coefficients
+    objective.set_value(solution.objective_value)
+    # TODO(d2rk): set only triggered variables.
+    for var in self._model.get_variables():
+      if var.get_name() in solution.get_variables_names():
+        var.set_value(solution.get_variable_value_by_name(var.get_name()))
+    return solution

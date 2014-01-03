@@ -14,6 +14,7 @@
 
 from les import backend_solvers
 from les.executors import executor_base
+from les.pipeline import Request
 from les.utils import logging
 
 
@@ -25,6 +26,8 @@ class DummyExecutor(executor_base.ExecutorBase):
   """Dummy executor doesn't know how to parallelize solving process. It simply
   solves models one by one in order they come.
   """
+  def build_request(self, *args, **kwargs):
+    return Request(*args, **kwargs)
 
   def execute(self, request):
     model = request.get_model()
