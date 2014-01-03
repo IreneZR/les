@@ -25,6 +25,7 @@ import "les/solution_tables/solution_tables.proto";
 
 enum Driver {
   LOCAL_ELIMINATION_DRIVER = 0;
+  ORACLE_DRIVER = 1;
 }
 
 message DriverParameters {
@@ -37,6 +38,16 @@ message DriverParameters {
 }
 
 message LocalEliminationDriverParameters {
+  // Max number of shared variables between two subproblems. In the worst case
+  // this driver will have to solve 2**max_num_shared_variables problems.
+  optional int64 max_num_shared_variables = 1 [default = 10];
+  optional les.decomposers.Decomposer decomposer = 2 [default = QUASIBLOCK_FINKELSTEIN_DECOMPOSER];
+  optional les.solution_tables.SolutionTable solution_table = 3 [default = SQLITE_SOLUTION_TABLE];
+  // A list of relaxations that will be applied one by one.
+  repeated les.backend_solvers.BackendSolver relaxation_backend_solvers = 4;
+}
+
+message OracleDriverParameters {
   // Max number of shared variables between two subproblems. In the worst case
   // this driver will have to solve 2**max_num_shared_variables problems.
   optional int64 max_num_shared_variables = 1 [default = 10];
