@@ -47,6 +47,13 @@ class SearchTree(object):
     self._unsolved_models[candidate_model.get_name()] = node
     if enumerator.has_next():
       self._enumerators[node] = enumerator
+    '''print "NODE"
+    node.get_model().pprint()
+    print "CANDIDATE MODEL"
+    candidate_model.pprint()
+    print "PARTIAL SOLUTION"
+    print partial_solution.get_objective_value()
+    print "\n\n"'''
     return node.get_model(), candidate_model, partial_solution
 
   def mark_model_as_solved(self, model):

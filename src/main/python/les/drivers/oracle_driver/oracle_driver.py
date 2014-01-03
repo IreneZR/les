@@ -73,7 +73,8 @@ class OracleDriver(driver_base.DriverBase):
     request.set_model(self._model)
     request.set_solver_id(self._optimization_params.driver.default_backend_solver)
     response = self._executor.execute(request)
-    return self._set_solution(response.get_solution())
+    return response.get_solution()
+    #self._set_solution(response.get_solution())
     #raise NotImplementedError()
 
   def _process_decomposition_tree(self, tree):
@@ -97,15 +98,27 @@ class OracleDriver(driver_base.DriverBase):
                  % (timeit.default_timer() - start_time,))
     tree = self._decomposer.get_decomposition_tree()
     if not self._process_decomposition_tree(tree):
-      return
+      return   
     if tree.get_num_nodes() == 1:
       return self._trivial_case()
-    self._search_tree = search_tree.SearchTree(tree)
-    self._solution_table.set_decomposition_tree(tree)
     old_tree = tree
     tree = self._decomposer.modify()
+    self._search_tree = search_tree.SearchTree(tree)
+    self._solution_table.set_decomposition_tree(tree)
+
     self.run()
+    
+    s = self._solution_table.get_solution()
+    print "Solution of modified model:"
+    print s.get_objective_value()
+    for i in s.get_variables_names():
+      print i,
+    print "\n"
+    
     result_sol = 0
+    solution = mp_solution.MPSolution()
+    solution.set_variables_names(self._model.get_variables_names())
+    solution._vars_values = [0]*self._model.get_num_variables()
     for i in old_tree.get_nodes():
       print "Prev model:"
       i.get_model().pprint()  
@@ -117,14 +130,12 @@ class OracleDriver(driver_base.DriverBase):
       print "Simple model:"
       simple_model.pprint()
       print ""
-      
-      odriver = OracleDriver()
+    
       request = self._executor.build_request()
-      request.set_model(mp_model_parameters.build(simple_model))
+      request.set_model(simple_model)#mp_model_parameters.build(simple_model))
       request.set_solver_id(self._optimization_params.driver.default_backend_solver)
-      response = self._pipeline.put_request(request)
-      odriver._set_solution(response.get_solution())  
-      simple_solution = odriver.get_solution()      
+      response = self._executor.execute(request)
+      simple_solution = response.get_solution()      
       '''fsolver = FrontendSolver()
       fsolver.load_model(simple_model)
       fsolver._optimization_params = params
@@ -145,21 +156,19 @@ class OracleDriver(driver_base.DriverBase):
       response = self._executor.execute(request)'''
       #simple_solution = response.get_solution()
         
-      for v in simple_model.get_variables():
-        var_name = v.get_name()
+      for var_name in simple_model.get_variables_names():
         if var_name in i.get_shared_variables():
-          names = solution_table.get_solution().get_variables_names()
+          names = self._solution_table.get_solution().get_variables_names()
         else:
           names = simple_solution.get_variables_names()
         if var_name in names:
-          self._set_solution_of_vars(var_name, 1.0)       
+          solution.set_variable_value(var_name, 1.0)       
     #############################################  
     print "Result = ", result_sol, "\n"
-
-  def _set_solution_of_vars(self, variable_name, variable_value):
-    var = self._model.get_variable_by_name(variable_name)
-    var.set_value(variable_value)
-
+    solution.set_objective_value(result_sol)
+    solution.set_status(solution.OPTIMAL)
+    return solution
+  
   def run(self):
     while True:
       if self._pipeline.has_responses():
@@ -217,11 +226,11 @@ class OracleDriver(driver_base.DriverBase):
   def get_solution(self):
     return self._solution_table.get_solution()
     
-  def _set_solution(self, solution):
+  '''def _set_solution(self, solution):
     objective = self._model.objective_coefficients
     objective.set_value(solution.objective_value)
     # TODO(d2rk): set only triggered variables.
     for var in self._model.get_variables():
       if var.get_name() in solution.get_variables_names():
         var.set_value(solution.get_variable_value_by_name(var.get_name()))
-    return solution
+    return solution'''

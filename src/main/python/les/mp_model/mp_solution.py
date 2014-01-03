@@ -99,3 +99,7 @@ class MPSolution(object):
       name = other.get_variables_names()[i]
       j = self._vars_names[name]
       self._vars_values[j] = other._vars_values[i]
+  
+  #new    
+  def set_variables_names(self, names):
+    self._vars_names = collections.OrderedDict(zip(names, range(len(names))))

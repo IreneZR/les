@@ -81,21 +81,21 @@ class FinkelsteinQBDecomposer(decomposer_base.DecomposerBase):
   def modify(self): 
     list_of_models = self._decomposition_tree.get_models()
     fbool = True
-    print dir(MPModel) #help
+    #print dir(MPModel) #help
     for m in list_of_models:
       kmodel = knapsack_model.KnapsackModel(m)
       kmodel.mp_model_to_knapsack(m)
       #kmodel.rows_senses = [m.rows_senses[0]]
       #kmodel.rows_coefficients = m.rows_coefficients.sum(0)
       #kmodel.rows_rhs = [sum(m.rows_rhs)]
-      m.pprint()
-      print "NEW MODEL"
-      print len(kmodel.get_profits())
+      #m.pprint()
+      #print "NEW MODEL"
+      #print len(kmodel.get_profits())
       new_model = mp_model_builder.MPModelBuilder().build_from_scratch(kmodel.get_profits(), [kmodel.get_weights()], ['L'], [kmodel.get_max_weight()], ["new_model"], [0 for j in range(m.get_num_columns())], [1 for j in range(m.get_num_columns())], m.columns_names)
       new_model.set_objective(kmodel.get_profits())
-      print "LEN", len(new_model.objective_coefficients)
+      #print "LEN", len(new_model.objective_coefficients)
       new_model.set_name(m.get_name())
-      new_model.pprint()
+      #new_model.pprint()
       new_vars_names = []
       #new_vars_names = new_model.get_variables()
       if fbool:

@@ -64,9 +64,42 @@ class MPModel(object_base.ObjectBase):
              self.get_num_columns(), self.maximization()))
 
   def make_simple_model(self, shared_variables=None, solution=None, 
-  											NumVariables=0):
-    new_model = MPModel()
-    new_model.set_objective(self.get_objective()._expr, True)
+  											NumVariables=0):   
+    obj_coeff = [] #
+    var_names = [] #
+    var_lbounds = [] #
+    var_ubounds = [] #
+    for ii in range(len(self.columns_names)):
+    	if not self.columns_names[ii] in shared_variables:
+    		obj_coeff.append(self.objective_coefficients[ii])
+    		var_names.append(self.columns_names[ii])
+    		var_lbounds.append(self.columns_lower_bounds[ii])
+    		var_ubounds.append(self.columns_upper_bounds[ii])
+    constr_senses = self.rows_senses #
+    constr_names = self.rows_names #
+    
+    constr_coeffs = [] #
+    constr_rhs = [] #
+    rc_matrix = self.rows_coefficients.toarray()
+    sol_var_names = solution.get_variables_names()
+    '''for ii in range(len(rc_matrix)):
+    	for jj in range(len(rc_matrix[ii])):
+    		print rc_matrix[ii][jj],
+    	print ""
+    print ""'''
+    for ii in range(len(self.rows_names)):
+    	new_constr = []
+    	constr_rhs.append(self.rows_rhs[ii])
+    	for jj in range(len(self.columns_names)):
+    		if not self.columns_names[jj] in shared_variables:
+    			new_constr.append(rc_matrix[ii][jj])
+    		elif self.columns_names[jj] in sol_var_names:     		
+    			constr_rhs[ii] -= rc_matrix[ii][jj]
+    	constr_coeffs.append(new_constr)
+    from les.mp_model.mp_model_builder import mp_model_builder
+    return mp_model_builder.MPModelBuilder().build_from_scratch(obj_coeff, constr_coeffs, constr_senses, constr_rhs, constr_names, var_lbounds, var_ubounds, var_names)
+
+    '''new_model.set_objective(self.objective_coefficients)
     constr = self.get_constraints()  
     m_vars = self.get_variables()  
     new_rows_rhs = []#constr[0].get_rhs()
@@ -81,10 +114,7 @@ class MPModel(object_base.ObjectBase):
         if i in variables_names and i in constr_var_names: # check
           new_rows_rhs[ii] -= c.get_coefficient(self.get_variable_by_name(i))
       ii = ii + 1
-    '''ii = 0
-    while ii < solution.get_num_variables():
-    	print variables_names[ii], variables_values[ii]
-    	ii = ii + 1'''
+      
     new_coeffs = []
     ii = 0
     while ii < len(constr):
@@ -104,7 +134,7 @@ class MPModel(object_base.ObjectBase):
     new_model.set_constraints_from_scratch(new_coeffs,
     [constr[i].get_sense() for i in range(len(constr))], new_rows_rhs, [constr[i].get_name() for i in range(len(constr))])
     #new_model.pprint()
-    return new_model # self 
+    #return new_model # self '''
     
   #def mp_model_to_knapsack(self):
     
@@ -156,14 +186,11 @@ class MPModel(object_base.ObjectBase):
     return self
 
   def set_objective(self, coefficients, name=None):
-    print "Aaaaaaaaaaaaaa!!!!!!!!!!!!"
     if isinstance(coefficients, tuple):
       self.objective_coefficients = list(coefficients)
-    print "Bbbbbbbbbbbbbb!!!!!!!!!!!!"
     if not isinstance(coefficients, list):
       raise TypeError("coefficients: %s" % coefficients)
     self.objective_coefficients = coefficients
-    print len(coefficients)
     self.objective_name = name
     return self
 
@@ -237,6 +264,9 @@ class MPModel(object_base.ObjectBase):
   #new
   def get_variables_names(self):
     return self.columns_names
+    
+  def get_num_variables(self):
+    return len(self.objective_coefficients)
 
   def get_status(self):
     return None

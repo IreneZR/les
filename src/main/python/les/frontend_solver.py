@@ -75,7 +75,7 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
     start_time = timeit.default_timer()
     try:
       self._executor.start()
-      self._driver.start()
+      tmp = self._driver.start()
     except KeyboardInterrupt:
       self._executor.stop()
       self._driver.stop()
@@ -86,5 +86,6 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
       return
     self._executor.stop()
     logging.info("Model was solved in %f second(s)"
-                 % (timeit.default_timer() - start_time,))
-    self._model.set_solution(self._driver.get_solution())
+                 % (timeit.default_timer() - start_time,))            
+    self._model.set_solution(tmp)
+    #self._model.set_solution(self._driver.get_solution())
