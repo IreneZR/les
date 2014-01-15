@@ -119,10 +119,16 @@ class OracleDriver(driver_base.DriverBase):
     solution = mp_solution.MPSolution()
     solution.set_variables_names(self._model.get_variables_names())
     solution._vars_values = [0]*self._model.get_num_variables()
+    shared_variables = []
     for i in old_tree.get_nodes():
       print "Prev model:"
       i.get_model().pprint()  
       print ""
+      
+      for v in i.get_shared_variables():
+        if not v in shared_variables:
+          shared_variables.append(v)      
+
       simple_model = i.get_model().make_simple_model(i.get_shared_variables(),
       										 self._solution_table.get_solution(), 
       										 self._model.get_num_variables())
@@ -147,7 +153,7 @@ class OracleDriver(driver_base.DriverBase):
       print "Solution with oracle:"
       print simple_solution.get_objective_value()
       for s in simple_solution.get_variables_names():
-        print s,
+        print s, "-", simple_solution.get_variable_value_by_name(s), " " 
       print "\n"
  
       '''request = self._executor.build_request()
@@ -156,14 +162,29 @@ class OracleDriver(driver_base.DriverBase):
       response = self._executor.execute(request)'''
       #simple_solution = response.get_solution()
         
-      for var_name in simple_model.get_variables_names():
+      for var_name in self._model.get_variables_names():#simple_model.get_variables_names():
+        #print var_name
+        #if var_name == "X3":
+          #print "???????"
         if var_name in i.get_shared_variables():
           names = self._solution_table.get_solution().get_variables_names()
+          '''if var_name == "X3":
+            for v in names:
+              print v,
+            print "=))))))))))))))))"'''
+          if var_name in names:
+            #print "????????????"
+            solution.set_variable_value(var_name, 1.0)
+            #print solution.get_variable_value_by_name(var_name)
         else:
           names = simple_solution.get_variables_names()
-        if var_name in names:
-          solution.set_variable_value(var_name, 1.0)       
+          if var_name in names and simple_solution.get_variable_value_by_name(var_name) == 1.0:
+            solution.set_variable_value(var_name, 1.0)       
     #############################################  
+    init_sol = self._solution_table.get_solution()
+    for v in shared_variables:
+      if v in init_sol.get_variables_names():
+        result_sol += self._model.get_objective_coefficient_by_name(v)
     print "Result = ", result_sol, "\n"
     solution.set_objective_value(result_sol)
     solution.set_status(solution.OPTIMAL)

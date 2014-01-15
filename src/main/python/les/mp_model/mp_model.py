@@ -95,6 +95,8 @@ class MPModel(object_base.ObjectBase):
     			new_constr.append(rc_matrix[ii][jj])
     		elif self.columns_names[jj] in sol_var_names:     		
     			constr_rhs[ii] -= rc_matrix[ii][jj]
+    			if constr_rhs[ii] < 0:
+    				constr_rhs[ii] = 0
     	constr_coeffs.append(new_constr)
     from les.mp_model.mp_model_builder import mp_model_builder
     return mp_model_builder.MPModelBuilder().build_from_scratch(obj_coeff, constr_coeffs, constr_senses, constr_rhs, constr_names, var_lbounds, var_ubounds, var_names)
@@ -297,6 +299,12 @@ class MPModel(object_base.ObjectBase):
     return self.objective_coefficients
 
   def get_objective_coefficient(self, i):
+    return self.objective_coefficients[i]
+
+  def get_objective_coefficient_by_name(self, var_name):
+    for i in range(len(self.columns_names)):
+      if var_name == self.columns_names[i]:
+        break
     return self.objective_coefficients[i]
 
   def get_objective_name(self):

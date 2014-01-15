@@ -93,6 +93,14 @@ class GoogleORLinearSolver(mp_solver_base.MPSolverBase):
     self._solution.set_status(_RESULT_STATUS_MAP[result_status])
     if not result_status == pywraplp.Solver.OPTIMAL:
       return
+    '''if "X1" in self._model.get_variables_names() and "X2" in self._model.get_variables_names():
+      for v in self._vars:
+        print v, 
+      print "=))))))))))))))))"'''
     self._solution.set_objective_value(self._solver.ObjectiveValue())
     self._solution.set_variables_values(self._model.columns_names,
                                    [var.SolutionValue() for var in self._vars])
+    '''if "X1" in self._model.get_variables_names() and "X2" in self._model.get_variables_names():
+      for v in self._solution.get_variables_values():
+        print v,
+      print "??????????"'''
