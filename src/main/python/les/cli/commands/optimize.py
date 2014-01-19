@@ -63,28 +63,11 @@ class Optimize(command_base.CommandBase):
     return params
 
   def run(self):
-    '''
-    model = mp_model.MPModelBuilder.build_from(self._args.file)
-    solver = SCIP()
-    solver.load_model(model)
-    start_time = timeit.default_timer()
-    solver.solve()
-    logging.info("Model was solved in %f second(s)"
-                 % (timeit.default_timer() - start_time,))
-    sol = solver.get_solution()
-    file = sys.stdout
-    file.write("Objective value: %f\n" % sol.get_objective_value())
-    file.write("Variables:\n")
-    vars_names = sol.get_variables_names()
-    vars_values = sol.get_variables_values()
-    #for i in range(sol.get_num_variables()):
-      #file.write("%15s = %f\n" % (vars_names[i], vars_values[i]))
-    '''
     model = mp_model.MPModelBuilder.build_from(self._args.file)
     params = self._get_optimization_parameters()
     model.optimize(params)
     file = sys.stdout
     file.write("Objective value: %f\n" % model.get_objective_value())
     file.write("Variables:\n")
-    #for i in range(model.get_num_columns()):
-      #file.write("%15s = %f\n" % (model.columns_names[i], model.columns_values[i]))'''
+    for i in range(model.get_num_columns()):
+      file.write("%15s = %f\n" % (model.columns_names[i], model.columns_values[i]))
