@@ -65,7 +65,29 @@ class MPModel(object_base.ObjectBase):
 
   def make_simple_model(self, shared_variables=None, solution=None, 
   											NumVariables=0):   
-    obj_coeff = [] #
+    rscope = []
+    cscope = []
+    sub_rhs = []
+    
+    for j in range(self.get_num_columns()):
+    	if not self.columns_names[j] in shared_variables:
+    		cscope.append(j)
+    for i in range(self.get_num_rows()):
+    	rscope.append(i)
+    	sub_rhs.append(0)
+    	for j in range(self.get_num_columns()):
+    		var_name = self.columns_names[j]
+    		if var_name in shared_variables and var_name in solution.get_variables_names(): 
+    			sub_rhs[i] += self.rows_coefficients._get_single_element(i, j) 			
+    
+    new_model = self.slice(rscope, cscope)
+    for i in range(new_model.get_num_rows()):
+    	new_model.rows_rhs[i] -= sub_rhs[i]
+    	if new_model.rows_rhs[i] < 0:
+    		new_model.rows_rhs[i] = 0
+    return new_model
+    
+    '''obj_coeff = [] #
     var_names = [] #
     var_lbounds = [] #
     var_ubounds = [] #
@@ -82,11 +104,7 @@ class MPModel(object_base.ObjectBase):
     constr_rhs = [] #
     rc_matrix = self.rows_coefficients.toarray()
     sol_var_names = solution.get_variables_names()
-    '''for ii in range(len(rc_matrix)):
-    	for jj in range(len(rc_matrix[ii])):
-    		print rc_matrix[ii][jj],
-    	print ""
-    print ""'''
+
     for ii in range(len(self.rows_names)):
     	new_constr = []
     	constr_rhs.append(self.rows_rhs[ii])
@@ -99,7 +117,7 @@ class MPModel(object_base.ObjectBase):
     				constr_rhs[ii] = 0
     	constr_coeffs.append(new_constr)
     from les.mp_model.mp_model_builder import mp_model_builder
-    return mp_model_builder.MPModelBuilder().build_from_scratch(obj_coeff, constr_coeffs, constr_senses, constr_rhs, constr_names, var_lbounds, var_ubounds, var_names)
+    return mp_model_builder.MPModelBuilder().build_from_scratch(obj_coeff, constr_coeffs, constr_senses, constr_rhs, constr_names, var_lbounds, var_ubounds, var_names)'''
 
     '''new_model.set_objective(self.objective_coefficients)
     constr = self.get_constraints()  

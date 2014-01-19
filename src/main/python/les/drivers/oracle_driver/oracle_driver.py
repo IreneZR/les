@@ -19,6 +19,7 @@ from les import decomposers
 from les import solution_tables
 from les.mp_model import mp_solution
 from les.drivers import driver_base
+from les.drivers.oracle_driver import my_tree
 from les.drivers.oracle_driver import search_tree
 from les import executors as executor_manager
 from les.utils import logging
@@ -102,90 +103,49 @@ class OracleDriver(driver_base.DriverBase):
     if tree.get_num_nodes() == 1:
       return self._trivial_case()
     old_tree = tree
-    tree = self._decomposer.modify()
+    
+    tree = my_tree.MyTree(tree).modify()
+
     self._search_tree = search_tree.SearchTree(tree)
     self._solution_table.set_decomposition_tree(tree)
 
     self.run()
     
     s = self._solution_table.get_solution()
-    print "Solution of modified model:"
-    print s.get_objective_value()
-    for i in s.get_variables_names():
-      print i,
-    print "\n"
-    
     result_sol = 0
     solution = mp_solution.MPSolution()
     solution.set_variables_names(self._model.get_variables_names())
     solution._vars_values = [0]*self._model.get_num_variables()
     shared_variables = []
-    for i in old_tree.get_nodes():
-      print "Prev model:"
-      i.get_model().pprint()  
-      print ""
-      
-      for v in i.get_shared_variables():
-        if not v in shared_variables:
-          shared_variables.append(v)      
-
+    for i in old_tree.get_nodes():    
       simple_model = i.get_model().make_simple_model(i.get_shared_variables(),
       										 self._solution_table.get_solution(), 
-      										 self._model.get_num_variables())
-      #simple_model = i.get_model()
-      print "Simple model:"
-      simple_model.pprint()
-      print ""
-    
+      										 self._model.get_num_variables())    
       request = self._executor.build_request()
-      request.set_model(simple_model)#mp_model_parameters.build(simple_model))
+      request.set_model(simple_model)
       request.set_solver_id(self._optimization_params.driver.default_backend_solver)
       response = self._executor.execute(request)
-      simple_solution = response.get_solution()      
-      '''fsolver = FrontendSolver()
-      fsolver.load_model(simple_model)
-      fsolver._optimization_params = params
-      fsolver._finalize_optimization_parameters(params)
-      fsolver._executor = executor_manager.get_instance_of(params.executor)
-      simple_solution = fsolver._solve_single_model()'''
-        
+      simple_solution = response.get_solution()     
       result_sol += simple_solution.get_objective_value()
-      print "Solution with oracle:"
-      print simple_solution.get_objective_value()
-      for s in simple_solution.get_variables_names():
-        print s, "-", simple_solution.get_variable_value_by_name(s), " " 
-      print "\n"
- 
-      '''request = self._executor.build_request()
-      request.set_model(mp_model_parameters.build(simple_model))
-      request.set_solver_id(self._optimization_params.default_backend_solver)
-      response = self._executor.execute(request)'''
-      #simple_solution = response.get_solution()
         
       for var_name in self._model.get_variables_names():#simple_model.get_variables_names():
-        #print var_name
-        #if var_name == "X3":
-          #print "???????"
         if var_name in i.get_shared_variables():
           names = self._solution_table.get_solution().get_variables_names()
-          '''if var_name == "X3":
-            for v in names:
-              print v,
-            print "=))))))))))))))))"'''
           if var_name in names:
-            #print "????????????"
             solution.set_variable_value(var_name, 1.0)
-            #print solution.get_variable_value_by_name(var_name)
         else:
           names = simple_solution.get_variables_names()
           if var_name in names and simple_solution.get_variable_value_by_name(var_name) == 1.0:
-            solution.set_variable_value(var_name, 1.0)       
-    #############################################  
+            solution.set_variable_value(var_name, 1.0)  
+      
+      for v in i.get_shared_variables():
+        if not v in shared_variables:
+          shared_variables.append(v)  
+            
     init_sol = self._solution_table.get_solution()
     for v in shared_variables:
       if v in init_sol.get_variables_names():
         result_sol += self._model.get_objective_coefficient_by_name(v)
-    print "Result = ", result_sol, "\n"
     solution.set_objective_value(result_sol)
     solution.set_status(solution.OPTIMAL)
     return solution

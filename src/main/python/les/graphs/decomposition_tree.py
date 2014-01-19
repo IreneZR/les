@@ -224,6 +224,13 @@ class DecompositionTree(nx.DiGraph):
     '''
     return [self.node[n]['model'] for n in self.nodes()]
 
+#new
+  def get_model_by_name(self, name):
+    for node in self.get_nodes():
+        if node.get_name() == name:
+          return node.get_model()
+    return None
+
   def set_root(self, root):
     logging.debug("Set %s as root node." % root.get_name())
     self._root = root
