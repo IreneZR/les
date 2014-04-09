@@ -15,7 +15,7 @@ import les.solution_tables.solution_tables_pb2
 DESCRIPTOR = descriptor.FileDescriptor(
   name='les/drivers/drivers.proto',
   package='les.drivers',
-  serialized_pb='\n\x19les/drivers/drivers.proto\x12\x0bles.drivers\x1a\x1bles/mp_model/mp_model.proto\x1a!les/decomposers/decomposers.proto\x1a)les/backend_solvers/backend_solvers.proto\x1a)les/solution_tables/solution_tables.proto\"\xd1\x01\n\x10\x44riverParameters\x12\x32\n\x06\x64river\x18\x01 \x02(\x0e\x32\x13.les.drivers.Driver:\rORACLE_DRIVER\x12\x42\n\x16\x64\x65\x66\x61ult_backend_solver\x18\x02 \x01(\x0e\x32\".les.backend_solvers.BackendSolver\x12\x45\n\x18oracle_driver_parameters\x18\x03 \x01(\x0b\x32#.les.drivers.OracleDriverParameters\"\xb7\x02\n LocalEliminationDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver\"\xad\x02\n\x16OracleDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver*9\n\x06\x44river\x12\x1c\n\x18LOCAL_ELIMINATION_DRIVER\x10\x00\x12\x11\n\rORACLE_DRIVER\x10\x01:^\n\x11\x64river_parameters\x12$.les.mp_model.OptimizationParameters\x18\x64 \x01(\x0b\x32\x1d.les.drivers.DriverParameters')
+  serialized_pb='\n\x19les/drivers/drivers.proto\x12\x0bles.drivers\x1a\x1bles/mp_model/mp_model.proto\x1a!les/decomposers/decomposers.proto\x1a)les/backend_solvers/backend_solvers.proto\x1a)les/solution_tables/solution_tables.proto\"\xb8\x02\n\x10\x44riverParameters\x12=\n\x06\x64river\x18\x01 \x02(\x0e\x32\x13.les.drivers.Driver:\x18LOCAL_ELIMINATION_DRIVER\x12\x42\n\x16\x64\x65\x66\x61ult_backend_solver\x18\x02 \x01(\x0e\x32\".les.backend_solvers.BackendSolver\x12Z\n#local_elimination_driver_parameters\x18\x03 \x01(\x0b\x32-.les.drivers.LocalEliminationDriverParameters\x12\x45\n\x18oracle_driver_parameters\x18\x04 \x01(\x0b\x32#.les.drivers.OracleDriverParameters\"\xb7\x02\n LocalEliminationDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver\"\xad\x02\n\x16OracleDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver*9\n\x06\x44river\x12\x1c\n\x18LOCAL_ELIMINATION_DRIVER\x10\x00\x12\x11\n\rORACLE_DRIVER\x10\x01:^\n\x11\x64river_parameters\x12$.les.mp_model.OptimizationParameters\x18\x64 \x01(\x0b\x32\x1d.les.drivers.DriverParameters')
 
 _DRIVER = descriptor.EnumDescriptor(
   name='Driver',
@@ -34,8 +34,8 @@ _DRIVER = descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=1022,
-  serialized_end=1079,
+  serialized_start=1125,
+  serialized_end=1182,
 )
 
 
@@ -62,7 +62,7 @@ _DRIVERPARAMETERS = descriptor.Descriptor(
     descriptor.FieldDescriptor(
       name='driver', full_name='les.drivers.DriverParameters.driver', index=0,
       number=1, type=14, cpp_type=8, label=2,
-      has_default_value=True, default_value=1,
+      has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -74,8 +74,15 @@ _DRIVERPARAMETERS = descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='oracle_driver_parameters', full_name='les.drivers.DriverParameters.oracle_driver_parameters', index=2,
+      name='local_elimination_driver_parameters', full_name='les.drivers.DriverParameters.local_elimination_driver_parameters', index=2,
       number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='oracle_driver_parameters', full_name='les.drivers.DriverParameters.oracle_driver_parameters', index=3,
+      number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -90,7 +97,7 @@ _DRIVERPARAMETERS = descriptor.Descriptor(
   is_extendable=False,
   extension_ranges=[],
   serialized_start=193,
-  serialized_end=402,
+  serialized_end=505,
 )
 
 
@@ -138,8 +145,8 @@ _LOCALELIMINATIONDRIVERPARAMETERS = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=405,
-  serialized_end=716,
+  serialized_start=508,
+  serialized_end=819,
 )
 
 
@@ -187,12 +194,13 @@ _ORACLEDRIVERPARAMETERS = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=719,
-  serialized_end=1020,
+  serialized_start=822,
+  serialized_end=1123,
 )
 
 _DRIVERPARAMETERS.fields_by_name['driver'].enum_type = _DRIVER
 _DRIVERPARAMETERS.fields_by_name['default_backend_solver'].enum_type = les.backend_solvers.backend_solvers_pb2._BACKENDSOLVER
+_DRIVERPARAMETERS.fields_by_name['local_elimination_driver_parameters'].message_type = _LOCALELIMINATIONDRIVERPARAMETERS
 _DRIVERPARAMETERS.fields_by_name['oracle_driver_parameters'].message_type = _ORACLEDRIVERPARAMETERS
 _LOCALELIMINATIONDRIVERPARAMETERS.fields_by_name['decomposer'].enum_type = les.decomposers.decomposers_pb2._DECOMPOSER
 _LOCALELIMINATIONDRIVERPARAMETERS.fields_by_name['solution_table'].enum_type = les.solution_tables.solution_tables_pb2._SOLUTIONTABLE

@@ -35,6 +35,7 @@ message DriverParameters {
   optional les.backend_solvers.BackendSolver default_backend_solver = 2;
   // Driver parameters extensions...
   optional LocalEliminationDriverParameters local_elimination_driver_parameters = 3;
+  optional OracleDriverParameters oracle_driver_parameters = 4;
 }
 
 message LocalEliminationDriverParameters {
