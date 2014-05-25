@@ -152,12 +152,14 @@ class SQLiteSolutionTable(db_solution_table_base.DBSolutionTableBase):
     if not self._decomposition_tree:
       raise Error("decomposition_tree wasn't set")
     conn = self._data_store.get_connection()
+    print self._decomposition_tree.get_root()
     result = conn.execute('SELECT MAX(value), true_vars FROM %s' %
                           self._decomposition_tree.get_root())
     try:
       objective_value, true_vars = result.fetchone()
     except Exception:
       raise Error()
+    print objective_value
     solution = mp_solution.MPSolution()
     solution.set_objective_value(objective_value)
     true_vars = json.loads(true_vars)

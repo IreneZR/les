@@ -14,13 +14,21 @@
 
 import collections
 import timeit
+import numpy
+import networkx as nx
 
 from les import decomposers
 from les import solution_tables
 from les.mp_model import mp_solution
 from les.drivers import driver_base
-from les.drivers.local_elimination_driver import search_tree
+from les.drivers.compl_diff_driver import search_tree
+from les.graphs.decomposition_tree import Node
+from les.graphs.decomposition_tree import Edge
+from les.graphs.decomposition_tree import DecompositionTree
+from networkx.algorithms.traversal.depth_first_search import dfs_postorder_nodes
+from les.ext.google.operations_research.linear_solver import pywraplp
 from les import executors as executor_manager
+from les.backend_solvers.scip import SCIP
 from les.utils import logging
 
 
@@ -44,17 +52,17 @@ class _SolveContext(object):
     return True
 
 
-class LocalEliminationDriver(driver_base.DriverBase):
+class ComplDiffDriver(driver_base.DriverBase):
 
   def __init__(self, model, optimization_parameters, pipeline):
-    super(LocalEliminationDriver, self).__init__()
+    super(ComplDiffDriver, self).__init__()
     if not model.is_binary():
       raise TypeError("Optimization can be applied only to binary integer "
                       "linear programming problems.")
     self._model = model
     self._pipeline = pipeline
     self._optimization_params = optimization_parameters
-    self._driver_params = optimization_parameters.driver.local_elimination_driver_parameters
+    self._driver_params = optimization_parameters.driver.compl_diff_driver_parameters
     self._executor = executor_manager.get_instance_of(optimization_parameters.executor.executor, self._pipeline)
     self._decomposer = decomposers.get_instance_of(self._driver_params.decomposer, model)
     logging.info("Decomposer: %s" % self._decomposer.__class__.__name__)
@@ -94,15 +102,149 @@ class LocalEliminationDriver(driver_base.DriverBase):
       return
     logging.info("Model was decomposed in %f second(s)."
                  % (timeit.default_timer() - start_time,))
+    #print "\nDEC_TIME:", timeit.default_timer() - start_time
+    #start_time = timeit.default_timer()
     tree = self._decomposer.get_decomposition_tree()
-    #if not self._process_decomposition_tree(tree):
+    #if not self._process_decomposition_tree(tree): ###uncomment!
     #  return
     if tree.get_num_nodes() == 1:
       return self._trivial_case()
+    
+    #self._search_tree = search_tree.SearchTree(tree)
+    #self._solution_table.set_decomposition_tree(tree)
+    #self.run()
+    dvars = {"$1":0, "$2":0}
+    vars_list = self._model.get_columns_names()
+    for i in range(len(vars_list)):
+      dvars[vars_list[i]] = i 
+    
+    G = nx.DiGraph(tree)
+    models = []
+    num = 0
+    models.append([None, [], [], 0])
+    for node_name in dfs_postorder_nodes(G, tree.get_root()): # pay attention to order (quasiblock)
+      node = tree.node[node_name]
+      m = node.get_model()
+      num += m.get_num_rows()
+      models.append([m, node.get_local_variables(), node.get_shared_variables(), num])
+    
+    new_list = []
+    new_list.append([None, 0])
+    k = 0
+    for i in range(1, len(models) - 1):
+      locvars = []
+      shvars = []
+      
+      for j in models[i][1]:
+        locvars.append(dvars[j])
+      m1 = self._model.slice(range(models[i-1][3], models[i][3]), locvars)
+      sm1 = sum(m1.get_objective_coefficients())
+      
+      for j in models[i][2]:
+        if j in models[i+1][2]:
+          shvars.append(dvars[j])
+      m2 = self._model.slice(range(models[i-1][3], models[i+1][3]), shvars)
+      sm2 = sum(m2.get_objective_coefficients())
+      
+      total = new_list[k-1][1] + sm1 + sm2
+      if new_list[k][0] != None:
+        #print models[i-1][0]
+        new_list[k][0].update_rhs(new_list[k][1]*1.0/total, models[i-1][0].get_num_rows(), new_list[k][0].get_num_rows())
+        #print models[i-1][0].get_num_rows(), new_list[k][0].get_num_rows(), "=)))"
+      m1.update_rhs(sm1*1.0/total, 0, m1.get_num_rows())
+      m2.update_rhs(sm2*1.0/total, 0, models[i][3] - models[i-1][3])
+      
+      new_list.append([m1, sm1])
+      new_list.append([m2, sm2])
+      k += 2
+    
+    locvars = []
+    i = len(models) - 1
+    for j in models[i][1]:
+      locvars.append(dvars[j])
+    m1 = self._model.slice(range(models[i-1][3], models[i][3]), locvars) 
+    sm1 = sum(m1.get_objective_coefficients())
+    total = new_list[k][1] + sm1
+    new_list[k][0].update_rhs(new_list[k][1]*1.0/total, new_list[k-1][0].get_num_rows(), new_list[k][0].get_num_rows()) 
+    m1.update_rhs(sm1*1.0/total, 0, models[len(models)-1][3] - models[len(models)-2][3])
+    new_list.append([m1, sm1])
+    
+    res_vars = []
+    num = 0
+    for m in new_list:
+      if m[0] != None:
+        #m[0].pprint()
+        #print m[1], "\n"
+        request = self._executor.build_request()
+        request.set_model(m[0])
+        request.set_solver_id(self._optimization_params.driver.default_backend_solver)
+        response = self._executor.execute(request)
+        sol = response.get_solution()
+        for i in range(sol.get_num_variables()):
+          if sol.get_variables_values()[i] == 1.0:
+            res_vars.append(sol.get_variables_names()[i])
+            num += 1
+    
+    #print num, "\n", res_vars 
+    prev_model = self._model
+    mtrx = self._model.rows_coefficients.toarray()#
+    varlist = self._model.get_columns_names()
+    prevrhs = self._model.get_rows_rhs()
+    #print "SOL_TIME:", timeit.default_timer() - start_time
+    #start_time = timeit.default_timer()
+    self._model = self._model.make_simple_model(res_vars, res_vars)
+    self._model, rv = self._model.preproc()
+    print rv
+    res_vars += rv
+    res = 0
+    for i in res_vars:
+      res += prev_model.get_objective_coefficient_by_name(i)
+    #print res_vars     
+    #self._model.pprint()
+    scip = SCIP()
+    scip.load_model(self._model)
+    params = pywraplp.MPSolverParameters()
+    params.SetIntegerParam(params.PRESOLVE, params.PRESOLVE_OFF)
+    scip.solve(params)
+    sol = scip.get_solution()
+    for i in range(len(sol.get_variables_names())):
+      if sol.get_variables_values()[i] == 1.0:
+        res_vars.append(sol.get_variables_names()[i])
+    for i in range(len(mtrx)):
+      sm = 0
+      for j in range(len(mtrx[i])):
+        if varlist[j] in res_vars:
+          sm += mtrx[i][j]
+      if sm > prevrhs[i]:
+        print "ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!=)"
+    '''self._decomposer = decomposers.get_instance_of(self._driver_params.decomposer, self._model)
+    self._decomposer.decompose()
+    tree = self._decomposer.get_decomposition_tree()
     self._search_tree = search_tree.SearchTree(tree)
     self._solution_table.set_decomposition_tree(tree)
-    self.run()
-    return self._solution_table.get_solution()
+    print "DEC2_TIME:", timeit.default_timer() - start_time
+    start_time = timeit.default_timer()
+    self.run()'''
+    #for v in var_list:
+    #  if not v in sol.get_variables_names():
+    #    if v in res_vars:
+          
+    res += sol.get_objective_value()
+    
+    list_res = []
+    solution = mp_solution.MPSolution()
+    for v in prev_model.get_variables_names():
+      if v in res_vars:
+        list_res.append(1.0)
+      else:
+        list_res.append(0.0)
+    solution.set_variables_values(prev_model.get_variables_names(), list_res)
+    solution.set_objective_value(res)
+    #print "RES:",res
+    #print "SOL_RUN_TIME:", timeit.default_timer() - start_time
+    return solution
+    #return sol
+    #return self._solution_table.get_solution()
 
   def run(self):
     while True:

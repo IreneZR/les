@@ -119,8 +119,8 @@ class QBBILPModelGenerator(mp_model_generator_base.MPModelGeneratorBase):
   def gen(self, *args, **kwargs):
     """Generates a quasi-block BILP problem.
 
-    :returns: A :class:`BILPProblem` instance with quasi-block structure or None.
-    """
+:returns: A :class:`BILPProblem` instance with quasi-block structure or None.
+"""
     params = (len(args) and isinstance(args[0], dict)) and args[0] or kwargs
     params = self.fix_params(params)
     if not self.check_params(params):
@@ -147,17 +147,23 @@ class QBBILPModelGenerator(mp_model_generator_base.MPModelGeneratorBase):
       # NOTE: separator size cannot be greater than number of variables in the
       # current block
       for i in xrange(len(blocks) - 1):
-        sep_size = random.randint(
-          min(params['separator_size']),
-          min((min([blocks[i].num_variables, blocks[i + 1].num_variables]) / 2),
-              max(params['separator_size']) / 2)
-        )
+        #sep_size = max(params['separator_size']) #### undo comment!!!!!!!!!
+        #sep_size = random.randint(4) #
+        #if sep_size == 0: #
+        #  sep_size = 1    #
+        #if sep_size == 4:
+        sep_size = 2
+        #  min(params['separator_size']),
+        #  min((min([blocks[i].num_variables, blocks[i + 1].num_variables]) / 2),
+        #      max(params['separator_size']) / 2)
+        #)
         blocks[i].right_separator_size = blocks[i + 1].left_separator_size = sep_size
         self._fill_block(blocks[i])
     else:
       for i in xrange(len(blocks) - 1):
-        sep_size = min((min([blocks[i].num_variables, blocks[i + 1].num_variables]) / 2),
-                       max(params['separator_size']))
+        sep_size = max(params['separator_size'])
+        #sep_size = min((min([blocks[i].num_variables, blocks[i + 1].num_variables]) / 2),
+        #               max(params['separator_size']))
         blocks[i].right_separator_size = blocks[i + 1].left_separator_size = sep_size
         self._fill_block(blocks[i])
     self._fill_block(blocks[-1])

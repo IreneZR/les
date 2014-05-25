@@ -88,4 +88,5 @@ class FrontendSolver(mp_solver_base.MPSolverBase):
     logging.info("Model was solved in %f second(s)"
                  % (timeit.default_timer() - start_time,))            
     self._model.set_solution(tmp)
+    return tmp ###
     #self._model.set_solution(self._driver.get_solution())

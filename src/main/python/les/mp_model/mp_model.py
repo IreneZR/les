@@ -63,8 +63,7 @@ class MPModel(object_base.ObjectBase):
             (self.__class__.__name__, self.get_num_rows(),
              self.get_num_columns(), self.maximization()))
 
-  def make_simple_model(self, shared_variables=None, solution=None, 
-  											NumVariables=0):   
+  def make_simple_model(self, shared_variables=None, solution=None):   
     rscope = []
     cscope = []
     sub_rhs = []
@@ -77,7 +76,7 @@ class MPModel(object_base.ObjectBase):
     	sub_rhs.append(0)
     	for j in range(self.get_num_columns()):
     		var_name = self.columns_names[j]
-    		if var_name in shared_variables and var_name in solution.get_variables_names(): 
+    		if var_name in shared_variables and var_name in solution: 
     			sub_rhs[i] += self.rows_coefficients._get_single_element(i, j) 			
     
     new_model = self.slice(rscope, cscope)
@@ -86,6 +85,62 @@ class MPModel(object_base.ObjectBase):
     	if new_model.rows_rhs[i] < 0:
     		new_model.rows_rhs[i] = 0
     return new_model
+    
+  def preproc(self):
+    rscope = []
+    cscope = []
+    tmpcscope = []
+    res_vars = [] # vars names with value 1 
+    num_rows = range(len(self.rows_names))
+    num_cols = range(len(self.columns_names))
+    mtrx = self.rows_coefficients.toarray()
+    #print mtrx
+    for j in num_cols:
+    	tmpbool = True
+    	for i in num_rows:
+    		if mtrx[i][j] > self.rows_rhs[i]:
+    			tmpbool = False
+    			break
+    	if tmpbool:
+    		tmpcscope.append(j)
+    		
+    #print tmpcscope
+  	# get result if all ones		
+    for i in num_rows:
+  		sm = 0
+  		for j in num_cols: 
+  			if j in tmpcscope:
+  				sm += mtrx[i][j]
+  		if sm > self.rows_rhs[i]:
+  			rscope.append(i)
+  	
+    for j in tmpcscope:
+    	tmpbool = False
+    	for i in rscope:
+    		if mtrx[i][j] != 0:
+    			tmpbool = True
+    			break
+    	if tmpbool:
+    		cscope.append(j)
+    	else:
+    		res_vars.append(self.columns_names[j])
+    #print rscope
+    #print cscope
+    if len(rscope) == 0:
+    	if len(cscope) != 0:
+    		print "Error!!!!!!!!!\npreproc\n"
+    	return None, res_vars
+      	
+    new_model = self.slice(rscope, cscope)		
+    return new_model, res_vars
+    
+  def update_rhs3(self, l, rhs, init, beg, end):
+    for i in range(beg, end):
+    	self.rows_rhs[i-beg+init] = int(l*rhs[i])
+    
+  def update_rhs(self, l, beg, end):
+    for i in range(beg, end):
+    	self.rows_rhs[i] = int(l*self.rows_rhs[i])
     
     '''obj_coeff = [] #
     var_names = [] #
@@ -155,9 +210,6 @@ class MPModel(object_base.ObjectBase):
     [constr[i].get_sense() for i in range(len(constr))], new_rows_rhs, [constr[i].get_name() for i in range(len(constr))])
     #new_model.pprint()
     #return new_model # self '''
-    
-  #def mp_model_to_knapsack(self):
-    
 
   def get_objective_value(self):
     return self.objective_value
@@ -190,7 +242,7 @@ class MPModel(object_base.ObjectBase):
     from les.frontend_solver import FrontendSolver
     solver = FrontendSolver()
     solver.load_model(self)
-    solver.solve(params)
+    solver.solve(params) 
 
   def set_columns(self, columns_lower_bounds=[], columns_upper_bounds=[],
                   columns_names=[]):
@@ -327,6 +379,12 @@ class MPModel(object_base.ObjectBase):
 
   def get_objective_name(self):
     return self.objective_name
+  #new  
+  def get_variable_index_by_name(self, name):
+    for i in range(len(self.columns_names)):
+      if name == self.columns_names[i]:
+        break
+    return i     
 
   def get_rows_coefficients(self):
     """Returns matrix of constraints coefficients.

@@ -22,6 +22,7 @@ from les.drivers import driver_base
 from les.drivers.oracle_driver import my_tree
 from les.drivers.oracle_driver import search_tree
 from les import executors as executor_manager
+from operator import itemgetter as it
 from les.utils import logging
 
 
@@ -64,8 +65,9 @@ class OracleDriver(driver_base.DriverBase):
       logging.info("Cannot create solution table: %d", self._driver_params.solution_table)
       return
     logging.info("Relaxation backend solvers are %s", self._driver_params.relaxation_backend_solvers)
-    self._solver_id_stack = list(self._driver_params.relaxation_backend_solvers)
-    self._solver_id_stack.append(optimization_parameters.driver.default_backend_solver)
+    self._solver_id_stack = [2] 
+    #self._solver_id_stack = list(self._driver_params.relaxation_backend_solvers)
+    #self._solver_id_stack.append(optimization_parameters.driver.default_backend_solver)
     self._active_contexts = collections.OrderedDict()
     self._frozen_contexts = {}
 
@@ -81,6 +83,7 @@ class OracleDriver(driver_base.DriverBase):
   def _process_decomposition_tree(self, tree):
     # TODO(d2rk): merge nodes if necessary.
     for node in tree.get_nodes():
+      #print node.get_num_shared_variables()
       if node.get_num_shared_variables() > self._driver_params.max_num_shared_variables:
         logging.debug('Node %s has too many shared variables: %d > %d',
                       node.get_name(), node.get_num_shared_variables(),
@@ -98,8 +101,9 @@ class OracleDriver(driver_base.DriverBase):
     logging.info("Model was decomposed in %f second(s)."
                  % (timeit.default_timer() - start_time,))
     tree = self._decomposer.get_decomposition_tree()
-    if not self._process_decomposition_tree(tree):
-      return   
+    #print self._model.get_num_columns()
+    #if not self._process_decomposition_tree(tree): ###uncomment!
+    #  return   
     if tree.get_num_nodes() == 1:
       return self._trivial_case()
     old_tree = tree
@@ -111,26 +115,49 @@ class OracleDriver(driver_base.DriverBase):
 
     self.run()
     
-    s = self._solution_table.get_solution()
+    sol_rel = self._solution_table.get_solution().get_variables_names() # eliminate all wrong vars
+    
+    list_of_vars = []
+    for ii in range(len(sol_rel)):
+      k = self._model.get_variable_index_by_name(sol_rel[ii])
+      list_of_vars.append([sol_rel[ii], self._model.get_objective_coefficients()[k], k]) # name, coeff, index
+    list_of_vars.sort(key = it(1), reverse = True)
+    sol_rel = []
+    mm = len(list_of_vars)
+    num_rows = self._model.get_num_rows()
+    lhs = [0]*num_rows
+    mtrx = self._model.get_rows_coefficients().toarray()
+    fbool = False
+    for jj in range(mm):
+      for ii in range(num_rows):
+        lhs[ii] += mtrx[ii][list_of_vars[jj][2]]
+        #print lhs[ii]
+        if lhs[ii] > self._model.get_rows_rhs()[ii]:
+          fbool = True
+          break
+      if fbool:
+        break
+      sol_rel.append(list_of_vars[jj][0])
+    
+    #print sol_rel
     result_sol = 0
     solution = mp_solution.MPSolution()
     solution.set_variables_names(self._model.get_variables_names())
     solution._vars_values = [0]*self._model.get_num_variables()
     shared_variables = []
     for i in old_tree.get_nodes():    
-      simple_model = i.get_model().make_simple_model(i.get_shared_variables(),
-      										 self._solution_table.get_solution(), 
-      										 self._model.get_num_variables())    
+      simple_model = i.get_model().make_simple_model(i.get_shared_variables(), sol_rel)    
       request = self._executor.build_request()
       request.set_model(simple_model)
-      request.set_solver_id(self._optimization_params.driver.default_backend_solver)
+      #simple_model.pprint()
+      request.set_solver_id(5) #self._optimization_params.driver.default_backend_solver
       response = self._executor.execute(request)
       simple_solution = response.get_solution()     
       result_sol += simple_solution.get_objective_value()
         
       for var_name in self._model.get_variables_names():#simple_model.get_variables_names():
         if var_name in i.get_shared_variables():
-          names = self._solution_table.get_solution().get_variables_names()
+          names = sol_rel
           if var_name in names:
             solution.set_variable_value(var_name, 1.0)
         else:
@@ -138,19 +165,22 @@ class OracleDriver(driver_base.DriverBase):
           if var_name in names and simple_solution.get_variable_value_by_name(var_name) == 1.0:
             solution.set_variable_value(var_name, 1.0)  
       
+      #print i.get_model().get_num_columns(), len(i.get_shared_variables()), "=)))"
+      
       for v in i.get_shared_variables():
         if not v in shared_variables:
           shared_variables.append(v)  
-            
-    init_sol = self._solution_table.get_solution()
+    #print shared_variables      
     for v in shared_variables:
-      if v in init_sol.get_variables_names():
+      if v in sol_rel:
         result_sol += self._model.get_objective_coefficient_by_name(v)
     solution.set_objective_value(result_sol)
     solution.set_status(solution.OPTIMAL)
     return solution
   
   def run(self):
+    #sm = 0
+    #sm5 = 0
     while True:
       if self._pipeline.has_responses():
         self.process_response(self._pipeline.get_response())
@@ -160,14 +190,23 @@ class OracleDriver(driver_base.DriverBase):
         continue
       if len(self._active_contexts) == 0:
         submodel, candidate_model, partial_solution = self._search_tree.next_unsolved_model()
+        '''submodel.pprint()
+        print
+        candidate_model.pprint()    
+        print "\n=)\n" '''
         self._active_contexts[candidate_model.get_name()] = _SolveContext(
           submodel, candidate_model, list(self._solver_id_stack), partial_solution)
       name, cxt = self._active_contexts.popitem()
       request = self._pipeline.build_request()
       request.set_model(cxt.candidate_model)
       request.set_solver_id(cxt.solver_id_stack[0])
+      #if request.get_solver_id() == 2:
+      #  sm += 1
+      #else:
+      #  sm5 += 1
       self._frozen_contexts[name] = cxt
-      self._pipeline.put_request(request)
+      self._pipeline.put_request(request) 
+    #print sm, sm5
 
   def process_response(self, response):
     cxt = self._frozen_contexts.pop(response.get_id())
@@ -187,6 +226,7 @@ class OracleDriver(driver_base.DriverBase):
         if cxt.set_best_objective_value(objective_value):
           logging.debug('Model %s has a new best objective value: %f',
                         response.get_id(), objective_value)
+          #print objective_value, "=)"
           cxt.partial_solution.update_variables_values(solution)
           cxt.partial_solution.set_objective_value(objective_value)
           logging.debug('Write %s solution to the table.', response.get_id())

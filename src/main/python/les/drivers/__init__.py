@@ -18,16 +18,30 @@ from les.utils import logging
 from les.drivers import drivers_pb2
 from les.drivers.local_elimination_driver import LocalEliminationDriver
 from les.drivers.oracle_driver.oracle_driver import OracleDriver
+from les.drivers.comparison_driver.comparison_driver import ComparisonDriver
+from les.drivers.simple_driver.simple_driver import SimpleDriver
+from les.drivers.greedy_driver.greedy_driver import GreedyDriver
+from les.drivers.compl_diff_driver.compl_diff_driver import ComplDiffDriver
+from les.drivers.compl_diff2_driver.compl_diff2_driver import ComplDiff2Driver
 
 
 LOCAL_ELIMINATION_DRIVER = drivers_pb2.LOCAL_ELIMINATION_DRIVER
-ORACLE_DRIVER = LOCAL_ELIMINATION_DRIVER + 1
+ORACLE_DRIVER            = drivers_pb2.ORACLE_DRIVER
+COMPARISON_DRIVER        = drivers_pb2.COMPARISON_DRIVER
+SIMPLE_DRIVER            = drivers_pb2.SIMPLE_DRIVER
+GREEDY_DRIVER            = drivers_pb2.GREEDY_DRIVER
+COMPL_DIFF_DRIVER        = drivers_pb2.COMPL_DIFF_DRIVER
+COMPL_DIFF2_DRIVER        = drivers_pb2.COMPL_DIFF2_DRIVER
 
 _DRIVERS_TABLE = {
   LOCAL_ELIMINATION_DRIVER: LocalEliminationDriver,
-  ORACLE_DRIVER: OracleDriver
+  ORACLE_DRIVER: OracleDriver,
+  COMPARISON_DRIVER: ComparisonDriver,
+  SIMPLE_DRIVER: SimpleDriver,
+  GREEDY_DRIVER: GreedyDriver,
+  COMPL_DIFF_DRIVER: ComplDiffDriver,
+  COMPL_DIFF2_DRIVER: ComplDiff2Driver
 }
-
 
 def get_instance_of(driver_id, *args, **kwargs):
   if not isinstance(driver_id, int):
