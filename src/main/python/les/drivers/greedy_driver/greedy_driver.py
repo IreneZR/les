@@ -19,7 +19,7 @@ from les import decomposers
 from les import solution_tables
 from les.mp_model import mp_solution
 from les.drivers import driver_base
-from les.drivers.greedy_driver import var_weights
+from les.drivers.greedy_driver import var_weights_tree
 from les.drivers.greedy_driver import search_tree
 from les import executors as executor_manager
 from les.utils import logging
@@ -75,8 +75,6 @@ class GreedyDriver(driver_base.DriverBase):
     request.set_solver_id(self._optimization_params.driver.default_backend_solver)
     response = self._executor.execute(request)
     return response.get_solution()
-    #self._set_solution(response.get_solution())
-    #raise NotImplementedError()
 
   def _process_decomposition_tree(self, tree):
     # TODO(d2rk): merge nodes if necessary.
@@ -97,22 +95,11 @@ class GreedyDriver(driver_base.DriverBase):
       return
     logging.info("Model was decomposed in %f second(s)."
                  % (timeit.default_timer() - start_time,))
-    tree = self._decomposer.get_decomposition_tree()
-    if not self._process_decomposition_tree(tree):
-      return   
+    tree = self._decomposer.get_decomposition_tree()  
     if tree.get_num_nodes() == 1:
       return self._trivial_case()
     old_tree = tree
-    
-    #tree = my_tree.MyTree(tree).modify()
-
-    #self._search_tree = search_tree.SearchTree(tree)
-    #self._solution_table.set_decomposition_tree(tree)
-
-    #self.run()
-    
-    #s = self._solution_table.get_solution()
-    s = var_weights.VarWeightsTree(tree).get_relaxed_solution(self._model) # gets names of variables with value 1.0
+    s = var_weights_tree.VarWeightsTree(tree).get_relaxed_solution(self._model) # gets names of variables with value 1.0
     result_sol = 0
     solution = mp_solution.MPSolution()
     solution.set_variables_names(self._model.get_variables_names())
@@ -142,18 +129,10 @@ class GreedyDriver(driver_base.DriverBase):
           shared_variables.append(v)  
             
     for v in shared_variables:
-      if v in s: #.get_variables_names():
+      if v in s:
         result_sol += self._model.get_objective_coefficient_by_name(v)
     solution.set_objective_value(result_sol)
     solution.set_status(solution.OPTIMAL)
-    '''print "Shared_vars:"
-    for i in shared_variables:
-      print i,
-    print "\nRelaxed_sol:"
-    for i in s:
-      print i,
-    print'''
-    #print "=)))))))))))))))))))))))))"
     return solution
   
   def run(self):
@@ -212,12 +191,3 @@ class GreedyDriver(driver_base.DriverBase):
 
   def get_solution(self):
     return self._solution_table.get_solution()
-    
-  '''def _set_solution(self, solution):
-    objective = self._model.objective_coefficients
-    objective.set_value(solution.objective_value)
-    # TODO(d2rk): set only triggered variables.
-    for var in self._model.get_variables():
-      if var.get_name() in solution.get_variables_names():
-        var.set_value(solution.get_variable_value_by_name(var.get_name()))
-    return solution'''

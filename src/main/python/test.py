@@ -9,24 +9,24 @@ from les.ext.google.operations_research.linear_solver import pywraplp
 from les.mp_model.mp_model_builder.formats import mps
 from les.mp_model.mp_model_builder import MPModelBuilder
 
-directory = '/home/ira/Desktop/imp/diploma/'
+directory = '.' #'/home/ira/Desktop/imp/diploma/'
 tests = os.listdir(directory)
 for t in tests:
   if t.endswith('.mps'):
-    model = MPModelBuilder.build_from(directory + t)
+    model = MPModelBuilder.build_from(t)
     
     print "\n\n", t, "\n"
     
-    '''print "Les"
+    print "LES"
     params = OptimizationParameters()
     params.driver.driver = 0
     solver = FrontendSolver()
     solver.load_model(model)
     start_time = timeit.default_timer()
-    sol1 = solver.solve(params)
-    print sol1.get_objective_value(), timeit.default_timer() - start_time'''
+    sol2 = solver.solve(params)
+    print sol2.get_objective_value(), timeit.default_timer() - start_time
     
-    print "Scip"
+    print "SCIP"
     params = pywraplp.MPSolverParameters()
     params.SetIntegerParam(params.PRESOLVE, params.PRESOLVE_OFF)
     start_time = timeit.default_timer()
@@ -39,7 +39,7 @@ for t in tests:
     names = sol0.get_variables_names()
     vals  = sol0.get_variables_values()
     
-    '''print "Oracle"
+    print "ORACLE"
     params = OptimizationParameters()
     params.driver.driver = 1
     solver = FrontendSolver()
@@ -53,7 +53,7 @@ for t in tests:
         tms += 1
     print "diff:", tms
   
-    print "Simple"
+    print "GREEDY"
     params = OptimizationParameters()
     params.driver.driver = 3
     solver = FrontendSolver()
@@ -65,9 +65,9 @@ for t in tests:
     for i in names:
       if sol3.get_variable_value_by_name(i) != sol0.get_variable_value_by_name(i):
         tms += 1
-    print "diff:", tms'''
+    print "diff:", tms
   
-    print "Compl_diff"
+    print "PREPROC"
     params = OptimizationParameters()
     params.driver.driver = 5
     solver = FrontendSolver()

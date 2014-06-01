@@ -94,7 +94,7 @@ class MPModel(object_base.ObjectBase):
     num_rows = range(len(self.rows_names))
     num_cols = range(len(self.columns_names))
     mtrx = self.rows_coefficients.toarray()
-    #print mtrx
+    
     for j in num_cols:
     	tmpbool = True
     	for i in num_rows:
@@ -104,8 +104,7 @@ class MPModel(object_base.ObjectBase):
     	if tmpbool:
     		tmpcscope.append(j)
     		
-    #print tmpcscope
-  	# get result if all ones		
+  	# get result if all 1.0		
     for i in num_rows:
   		sm = 0
   		for j in num_cols: 
@@ -124,92 +123,18 @@ class MPModel(object_base.ObjectBase):
     		cscope.append(j)
     	else:
     		res_vars.append(self.columns_names[j])
-    #print rscope
-    #print cscope
+
     if len(rscope) == 0:
     	if len(cscope) != 0:
-    		print "Error!!!!!!!!!\npreproc\n"
+    		print "Error in preproc!\n"
     	return None, res_vars
       	
     new_model = self.slice(rscope, cscope)		
     return new_model, res_vars
     
-  def update_rhs3(self, l, rhs, init, beg, end):
-    for i in range(beg, end):
-    	self.rows_rhs[i-beg+init] = int(l*rhs[i])
-    
   def update_rhs(self, l, beg, end):
     for i in range(beg, end):
     	self.rows_rhs[i] = int(l*self.rows_rhs[i])
-    
-    '''obj_coeff = [] #
-    var_names = [] #
-    var_lbounds = [] #
-    var_ubounds = [] #
-    for ii in range(len(self.columns_names)):
-    	if not self.columns_names[ii] in shared_variables:
-    		obj_coeff.append(self.objective_coefficients[ii])
-    		var_names.append(self.columns_names[ii])
-    		var_lbounds.append(self.columns_lower_bounds[ii])
-    		var_ubounds.append(self.columns_upper_bounds[ii])
-    constr_senses = self.rows_senses #
-    constr_names = self.rows_names #
-    
-    constr_coeffs = [] #
-    constr_rhs = [] #
-    rc_matrix = self.rows_coefficients.toarray()
-    sol_var_names = solution.get_variables_names()
-
-    for ii in range(len(self.rows_names)):
-    	new_constr = []
-    	constr_rhs.append(self.rows_rhs[ii])
-    	for jj in range(len(self.columns_names)):
-    		if not self.columns_names[jj] in shared_variables:
-    			new_constr.append(rc_matrix[ii][jj])
-    		elif self.columns_names[jj] in sol_var_names:     		
-    			constr_rhs[ii] -= rc_matrix[ii][jj]
-    			if constr_rhs[ii] < 0:
-    				constr_rhs[ii] = 0
-    	constr_coeffs.append(new_constr)
-    from les.mp_model.mp_model_builder import mp_model_builder
-    return mp_model_builder.MPModelBuilder().build_from_scratch(obj_coeff, constr_coeffs, constr_senses, constr_rhs, constr_names, var_lbounds, var_ubounds, var_names)'''
-
-    '''new_model.set_objective(self.objective_coefficients)
-    constr = self.get_constraints()  
-    m_vars = self.get_variables()  
-    new_rows_rhs = []#constr[0].get_rhs()
-    variables_names = solution.get_variables_names()    
-    ii = 0
-    for c in constr:
-      constr_var_names = []
-      for i in c.get_variables():
-        constr_var_names.append(i.get_name())
-      new_rows_rhs.append(c.get_rhs())
-      for i in shared_variables:
-        if i in variables_names and i in constr_var_names: # check
-          new_rows_rhs[ii] -= c.get_coefficient(self.get_variable_by_name(i))
-      ii = ii + 1
-      
-    new_coeffs = []
-    ii = 0
-    while ii < len(constr):
-      tmp_coeffs = []
-      jj = 0
-      while jj < NumVariables:
-        tmp_coeffs.append(0)
-        jj = jj + 1
-      new_coeffs.append(tmp_coeffs)
-      ii = ii + 1
-    ii = 0
-    while ii < len(constr):
-      for v in m_vars:
-        if not v.get_name() in shared_variables:
-          new_coeffs[ii][v.get_index()] = constr[ii].get_coefficient(v)
-      ii = ii + 1
-    new_model.set_constraints_from_scratch(new_coeffs,
-    [constr[i].get_sense() for i in range(len(constr))], new_rows_rhs, [constr[i].get_name() for i in range(len(constr))])
-    #new_model.pprint()
-    #return new_model # self '''
 
   def get_objective_value(self):
     return self.objective_value

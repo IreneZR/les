@@ -17,7 +17,6 @@ class MyTree(DecompositionTree):
     self._tree= tree
   
   def modify(self): 
-    #list_of_models = self._tree.get_models()
     list_of_models = []
     names = []
     tmpbool = True   

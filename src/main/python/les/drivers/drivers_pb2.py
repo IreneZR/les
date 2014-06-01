@@ -15,7 +15,7 @@ import les.solution_tables.solution_tables_pb2
 DESCRIPTOR = descriptor.FileDescriptor(
   name='les/drivers/drivers.proto',
   package='les.drivers',
-  serialized_pb='\n\x19les/drivers/drivers.proto\x12\x0bles.drivers\x1a\x1bles/mp_model/mp_model.proto\x1a!les/decomposers/decomposers.proto\x1a)les/backend_solvers/backend_solvers.proto\x1a)les/solution_tables/solution_tables.proto\"\xb2\x05\n\x10\x44riverParameters\x12=\n\x06\x64river\x18\x01 \x02(\x0e\x32\x13.les.drivers.Driver:\x18LOCAL_ELIMINATION_DRIVER\x12\x42\n\x16\x64\x65\x66\x61ult_backend_solver\x18\x02 \x01(\x0e\x32\".les.backend_solvers.BackendSolver\x12Z\n#local_elimination_driver_parameters\x18\x03 \x01(\x0b\x32-.les.drivers.LocalEliminationDriverParameters\x12\x45\n\x18oracle_driver_parameters\x18\x04 \x01(\x0b\x32#.les.drivers.OracleDriverParameters\x12M\n\x1c\x63omparison_driver_parameters\x18\x05 \x01(\x0b\x32\'.les.drivers.ComparisonDriverParameters\x12\x45\n\x18simple_driver_parameters\x18\x06 \x01(\x0b\x32#.les.drivers.SimpleDriverParameters\x12\x45\n\x18greedy_driver_parameters\x18\x07 \x01(\x0b\x32#.les.drivers.GreedyDriverParameters\x12L\n\x1c\x63ompl_diff_driver_parameters\x18\x08 \x01(\x0b\x32&.les.drivers.ComplDiffDriverParameters\x12M\n\x1d\x63ompl_diff2_driver_parameters\x18\t \x01(\x0b\x32&.les.drivers.ComplDiffDriverParameters\"\xb7\x02\n LocalEliminationDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver\"\xad\x02\n\x16OracleDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver\"\xb1\x02\n\x1a\x43omparisonDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver\"\xad\x02\n\x16SimpleDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver\"\xad\x02\n\x16GreedyDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver\"\xb0\x02\n\x19\x43omplDiffDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver\"\xb1\x02\n\x1a\x43omplDiff2DriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver*\xa5\x01\n\x06\x44river\x12\x1c\n\x18LOCAL_ELIMINATION_DRIVER\x10\x00\x12\x11\n\rORACLE_DRIVER\x10\x01\x12\x15\n\x11\x43OMPARISON_DRIVER\x10\x02\x12\x11\n\rSIMPLE_DRIVER\x10\x03\x12\x11\n\rGREEDY_DRIVER\x10\x04\x12\x15\n\x11\x43OMPL_DIFF_DRIVER\x10\x05\x12\x16\n\x12\x43OMPL_DIFF2_DRIVER\x10\x06:^\n\x11\x64river_parameters\x12$.les.mp_model.OptimizationParameters\x18\x64 \x01(\x0b\x32\x1d.les.drivers.DriverParameters')
+  serialized_pb='\n\x19les/drivers/drivers.proto\x12\x0bles.drivers\x1a\x1bles/mp_model/mp_model.proto\x1a!les/decomposers/decomposers.proto\x1a)les/backend_solvers/backend_solvers.proto\x1a)les/solution_tables/solution_tables.proto\"\xc8\x03\n\x10\x44riverParameters\x12=\n\x06\x64river\x18\x01 \x02(\x0e\x32\x13.les.drivers.Driver:\x18LOCAL_ELIMINATION_DRIVER\x12\x42\n\x16\x64\x65\x66\x61ult_backend_solver\x18\x02 \x01(\x0e\x32\".les.backend_solvers.BackendSolver\x12Z\n#local_elimination_driver_parameters\x18\x03 \x01(\x0b\x32-.les.drivers.LocalEliminationDriverParameters\x12\x45\n\x18oracle_driver_parameters\x18\x04 \x01(\x0b\x32#.les.drivers.OracleDriverParameters\x12\x45\n\x18greedy_driver_parameters\x18\x05 \x01(\x0b\x32#.les.drivers.GreedyDriverParameters\x12G\n\x19preproc_driver_parameters\x18\x06 \x01(\x0b\x32$.les.drivers.PreprocDriverParameters\"\xb7\x02\n LocalEliminationDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver\"\xad\x02\n\x16OracleDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver\"\xad\x02\n\x16GreedyDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver\"\xae\x02\n\x17PreprocDriverParameters\x12$\n\x18max_num_shared_variables\x18\x01 \x01(\x03:\x02\x31\x30\x12R\n\ndecomposer\x18\x02 \x01(\x0e\x32\x1b.les.decomposers.Decomposer:!QUASIBLOCK_FINKELSTEIN_DECOMPOSER\x12Q\n\x0esolution_table\x18\x03 \x01(\x0e\x32\".les.solution_tables.SolutionTable:\x15SQLITE_SOLUTION_TABLE\x12\x46\n\x1arelaxation_backend_solvers\x18\x04 \x03(\x0e\x32\".les.backend_solvers.BackendSolver*`\n\x06\x44river\x12\x1c\n\x18LOCAL_ELIMINATION_DRIVER\x10\x00\x12\x11\n\rORACLE_DRIVER\x10\x01\x12\x11\n\rGREEDY_DRIVER\x10\x02\x12\x12\n\x0ePREPROC_DRIVER\x10\x03:^\n\x11\x64river_parameters\x12$.les.mp_model.OptimizationParameters\x18\x64 \x01(\x0b\x32\x1d.les.drivers.DriverParameters')
 
 _DRIVER = descriptor.EnumDescriptor(
   name='Driver',
@@ -32,40 +32,25 @@ _DRIVER = descriptor.EnumDescriptor(
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='COMPARISON_DRIVER', index=2, number=2,
+      name='GREEDY_DRIVER', index=2, number=2,
       options=None,
       type=None),
     descriptor.EnumValueDescriptor(
-      name='SIMPLE_DRIVER', index=3, number=3,
-      options=None,
-      type=None),
-    descriptor.EnumValueDescriptor(
-      name='GREEDY_DRIVER', index=4, number=4,
-      options=None,
-      type=None),
-    descriptor.EnumValueDescriptor(
-      name='COMPL_DIFF_DRIVER', index=5, number=5,
-      options=None,
-      type=None),
-    descriptor.EnumValueDescriptor(
-      name='COMPL_DIFF2_DRIVER', index=6, number=6,
+      name='PREPROC_DRIVER', index=3, number=3,
       options=None,
       type=None),
   ],
   containing_type=None,
   options=None,
-  serialized_start=3035,
-  serialized_end=3200,
+  serialized_start=1878,
+  serialized_end=1974,
 )
 
 
 LOCAL_ELIMINATION_DRIVER = 0
 ORACLE_DRIVER = 1
-COMPARISON_DRIVER = 2
-SIMPLE_DRIVER = 3
-GREEDY_DRIVER = 4
-COMPL_DIFF_DRIVER = 5
-COMPL_DIFF2_DRIVER = 6
+GREEDY_DRIVER = 2
+PREPROC_DRIVER = 3
 
 DRIVER_PARAMETERS_FIELD_NUMBER = 100
 driver_parameters = descriptor.FieldDescriptor(
@@ -113,36 +98,15 @@ _DRIVERPARAMETERS = descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='comparison_driver_parameters', full_name='les.drivers.DriverParameters.comparison_driver_parameters', index=4,
+      name='greedy_driver_parameters', full_name='les.drivers.DriverParameters.greedy_driver_parameters', index=4,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='simple_driver_parameters', full_name='les.drivers.DriverParameters.simple_driver_parameters', index=5,
+      name='preproc_driver_parameters', full_name='les.drivers.DriverParameters.preproc_driver_parameters', index=5,
       number=6, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='greedy_driver_parameters', full_name='les.drivers.DriverParameters.greedy_driver_parameters', index=6,
-      number=7, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='compl_diff_driver_parameters', full_name='les.drivers.DriverParameters.compl_diff_driver_parameters', index=7,
-      number=8, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='compl_diff2_driver_parameters', full_name='les.drivers.DriverParameters.compl_diff2_driver_parameters', index=8,
-      number=9, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -157,7 +121,7 @@ _DRIVERPARAMETERS = descriptor.Descriptor(
   is_extendable=False,
   extension_ranges=[],
   serialized_start=193,
-  serialized_end=883,
+  serialized_end=649,
 )
 
 
@@ -205,8 +169,8 @@ _LOCALELIMINATIONDRIVERPARAMETERS = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=886,
-  serialized_end=1197,
+  serialized_start=652,
+  serialized_end=963,
 )
 
 
@@ -254,106 +218,8 @@ _ORACLEDRIVERPARAMETERS = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1200,
-  serialized_end=1501,
-)
-
-
-_COMPARISONDRIVERPARAMETERS = descriptor.Descriptor(
-  name='ComparisonDriverParameters',
-  full_name='les.drivers.ComparisonDriverParameters',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    descriptor.FieldDescriptor(
-      name='max_num_shared_variables', full_name='les.drivers.ComparisonDriverParameters.max_num_shared_variables', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=True, default_value=10,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='decomposer', full_name='les.drivers.ComparisonDriverParameters.decomposer', index=1,
-      number=2, type=14, cpp_type=8, label=1,
-      has_default_value=True, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='solution_table', full_name='les.drivers.ComparisonDriverParameters.solution_table', index=2,
-      number=3, type=14, cpp_type=8, label=1,
-      has_default_value=True, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='relaxation_backend_solvers', full_name='les.drivers.ComparisonDriverParameters.relaxation_backend_solvers', index=3,
-      number=4, type=14, cpp_type=8, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  extension_ranges=[],
-  serialized_start=1504,
-  serialized_end=1809,
-)
-
-
-_SIMPLEDRIVERPARAMETERS = descriptor.Descriptor(
-  name='SimpleDriverParameters',
-  full_name='les.drivers.SimpleDriverParameters',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    descriptor.FieldDescriptor(
-      name='max_num_shared_variables', full_name='les.drivers.SimpleDriverParameters.max_num_shared_variables', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=True, default_value=10,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='decomposer', full_name='les.drivers.SimpleDriverParameters.decomposer', index=1,
-      number=2, type=14, cpp_type=8, label=1,
-      has_default_value=True, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='solution_table', full_name='les.drivers.SimpleDriverParameters.solution_table', index=2,
-      number=3, type=14, cpp_type=8, label=1,
-      has_default_value=True, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='relaxation_backend_solvers', full_name='les.drivers.SimpleDriverParameters.relaxation_backend_solvers', index=3,
-      number=4, type=14, cpp_type=8, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  extension_ranges=[],
-  serialized_start=1812,
-  serialized_end=2113,
+  serialized_start=966,
+  serialized_end=1267,
 )
 
 
@@ -401,41 +267,41 @@ _GREEDYDRIVERPARAMETERS = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2116,
-  serialized_end=2417,
+  serialized_start=1270,
+  serialized_end=1571,
 )
 
 
-_COMPLDIFFDRIVERPARAMETERS = descriptor.Descriptor(
-  name='ComplDiffDriverParameters',
-  full_name='les.drivers.ComplDiffDriverParameters',
+_PREPROCDRIVERPARAMETERS = descriptor.Descriptor(
+  name='PreprocDriverParameters',
+  full_name='les.drivers.PreprocDriverParameters',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='max_num_shared_variables', full_name='les.drivers.ComplDiffDriverParameters.max_num_shared_variables', index=0,
+      name='max_num_shared_variables', full_name='les.drivers.PreprocDriverParameters.max_num_shared_variables', index=0,
       number=1, type=3, cpp_type=2, label=1,
       has_default_value=True, default_value=10,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='decomposer', full_name='les.drivers.ComplDiffDriverParameters.decomposer', index=1,
+      name='decomposer', full_name='les.drivers.PreprocDriverParameters.decomposer', index=1,
       number=2, type=14, cpp_type=8, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='solution_table', full_name='les.drivers.ComplDiffDriverParameters.solution_table', index=2,
+      name='solution_table', full_name='les.drivers.PreprocDriverParameters.solution_table', index=2,
       number=3, type=14, cpp_type=8, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='relaxation_backend_solvers', full_name='les.drivers.ComplDiffDriverParameters.relaxation_backend_solvers', index=3,
+      name='relaxation_backend_solvers', full_name='les.drivers.PreprocDriverParameters.relaxation_backend_solvers', index=3,
       number=4, type=14, cpp_type=8, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -450,97 +316,33 @@ _COMPLDIFFDRIVERPARAMETERS = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2420,
-  serialized_end=2724,
-)
-
-
-_COMPLDIFF2DRIVERPARAMETERS = descriptor.Descriptor(
-  name='ComplDiff2DriverParameters',
-  full_name='les.drivers.ComplDiff2DriverParameters',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    descriptor.FieldDescriptor(
-      name='max_num_shared_variables', full_name='les.drivers.ComplDiff2DriverParameters.max_num_shared_variables', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=True, default_value=10,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='decomposer', full_name='les.drivers.ComplDiff2DriverParameters.decomposer', index=1,
-      number=2, type=14, cpp_type=8, label=1,
-      has_default_value=True, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='solution_table', full_name='les.drivers.ComplDiff2DriverParameters.solution_table', index=2,
-      number=3, type=14, cpp_type=8, label=1,
-      has_default_value=True, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='relaxation_backend_solvers', full_name='les.drivers.ComplDiff2DriverParameters.relaxation_backend_solvers', index=3,
-      number=4, type=14, cpp_type=8, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  extension_ranges=[],
-  serialized_start=2727,
-  serialized_end=3032,
+  serialized_start=1574,
+  serialized_end=1876,
 )
 
 _DRIVERPARAMETERS.fields_by_name['driver'].enum_type = _DRIVER
 _DRIVERPARAMETERS.fields_by_name['default_backend_solver'].enum_type = les.backend_solvers.backend_solvers_pb2._BACKENDSOLVER
 _DRIVERPARAMETERS.fields_by_name['local_elimination_driver_parameters'].message_type = _LOCALELIMINATIONDRIVERPARAMETERS
 _DRIVERPARAMETERS.fields_by_name['oracle_driver_parameters'].message_type = _ORACLEDRIVERPARAMETERS
-_DRIVERPARAMETERS.fields_by_name['comparison_driver_parameters'].message_type = _COMPARISONDRIVERPARAMETERS
-_DRIVERPARAMETERS.fields_by_name['simple_driver_parameters'].message_type = _SIMPLEDRIVERPARAMETERS
 _DRIVERPARAMETERS.fields_by_name['greedy_driver_parameters'].message_type = _GREEDYDRIVERPARAMETERS
-_DRIVERPARAMETERS.fields_by_name['compl_diff_driver_parameters'].message_type = _COMPLDIFFDRIVERPARAMETERS
-_DRIVERPARAMETERS.fields_by_name['compl_diff2_driver_parameters'].message_type = _COMPLDIFFDRIVERPARAMETERS
+_DRIVERPARAMETERS.fields_by_name['preproc_driver_parameters'].message_type = _PREPROCDRIVERPARAMETERS
 _LOCALELIMINATIONDRIVERPARAMETERS.fields_by_name['decomposer'].enum_type = les.decomposers.decomposers_pb2._DECOMPOSER
 _LOCALELIMINATIONDRIVERPARAMETERS.fields_by_name['solution_table'].enum_type = les.solution_tables.solution_tables_pb2._SOLUTIONTABLE
 _LOCALELIMINATIONDRIVERPARAMETERS.fields_by_name['relaxation_backend_solvers'].enum_type = les.backend_solvers.backend_solvers_pb2._BACKENDSOLVER
 _ORACLEDRIVERPARAMETERS.fields_by_name['decomposer'].enum_type = les.decomposers.decomposers_pb2._DECOMPOSER
 _ORACLEDRIVERPARAMETERS.fields_by_name['solution_table'].enum_type = les.solution_tables.solution_tables_pb2._SOLUTIONTABLE
 _ORACLEDRIVERPARAMETERS.fields_by_name['relaxation_backend_solvers'].enum_type = les.backend_solvers.backend_solvers_pb2._BACKENDSOLVER
-_COMPARISONDRIVERPARAMETERS.fields_by_name['decomposer'].enum_type = les.decomposers.decomposers_pb2._DECOMPOSER
-_COMPARISONDRIVERPARAMETERS.fields_by_name['solution_table'].enum_type = les.solution_tables.solution_tables_pb2._SOLUTIONTABLE
-_COMPARISONDRIVERPARAMETERS.fields_by_name['relaxation_backend_solvers'].enum_type = les.backend_solvers.backend_solvers_pb2._BACKENDSOLVER
-_SIMPLEDRIVERPARAMETERS.fields_by_name['decomposer'].enum_type = les.decomposers.decomposers_pb2._DECOMPOSER
-_SIMPLEDRIVERPARAMETERS.fields_by_name['solution_table'].enum_type = les.solution_tables.solution_tables_pb2._SOLUTIONTABLE
-_SIMPLEDRIVERPARAMETERS.fields_by_name['relaxation_backend_solvers'].enum_type = les.backend_solvers.backend_solvers_pb2._BACKENDSOLVER
 _GREEDYDRIVERPARAMETERS.fields_by_name['decomposer'].enum_type = les.decomposers.decomposers_pb2._DECOMPOSER
 _GREEDYDRIVERPARAMETERS.fields_by_name['solution_table'].enum_type = les.solution_tables.solution_tables_pb2._SOLUTIONTABLE
 _GREEDYDRIVERPARAMETERS.fields_by_name['relaxation_backend_solvers'].enum_type = les.backend_solvers.backend_solvers_pb2._BACKENDSOLVER
-_COMPLDIFFDRIVERPARAMETERS.fields_by_name['decomposer'].enum_type = les.decomposers.decomposers_pb2._DECOMPOSER
-_COMPLDIFFDRIVERPARAMETERS.fields_by_name['solution_table'].enum_type = les.solution_tables.solution_tables_pb2._SOLUTIONTABLE
-_COMPLDIFFDRIVERPARAMETERS.fields_by_name['relaxation_backend_solvers'].enum_type = les.backend_solvers.backend_solvers_pb2._BACKENDSOLVER
-_COMPLDIFF2DRIVERPARAMETERS.fields_by_name['decomposer'].enum_type = les.decomposers.decomposers_pb2._DECOMPOSER
-_COMPLDIFF2DRIVERPARAMETERS.fields_by_name['solution_table'].enum_type = les.solution_tables.solution_tables_pb2._SOLUTIONTABLE
-_COMPLDIFF2DRIVERPARAMETERS.fields_by_name['relaxation_backend_solvers'].enum_type = les.backend_solvers.backend_solvers_pb2._BACKENDSOLVER
+_PREPROCDRIVERPARAMETERS.fields_by_name['decomposer'].enum_type = les.decomposers.decomposers_pb2._DECOMPOSER
+_PREPROCDRIVERPARAMETERS.fields_by_name['solution_table'].enum_type = les.solution_tables.solution_tables_pb2._SOLUTIONTABLE
+_PREPROCDRIVERPARAMETERS.fields_by_name['relaxation_backend_solvers'].enum_type = les.backend_solvers.backend_solvers_pb2._BACKENDSOLVER
 DESCRIPTOR.message_types_by_name['DriverParameters'] = _DRIVERPARAMETERS
 DESCRIPTOR.message_types_by_name['LocalEliminationDriverParameters'] = _LOCALELIMINATIONDRIVERPARAMETERS
 DESCRIPTOR.message_types_by_name['OracleDriverParameters'] = _ORACLEDRIVERPARAMETERS
-DESCRIPTOR.message_types_by_name['ComparisonDriverParameters'] = _COMPARISONDRIVERPARAMETERS
-DESCRIPTOR.message_types_by_name['SimpleDriverParameters'] = _SIMPLEDRIVERPARAMETERS
 DESCRIPTOR.message_types_by_name['GreedyDriverParameters'] = _GREEDYDRIVERPARAMETERS
-DESCRIPTOR.message_types_by_name['ComplDiffDriverParameters'] = _COMPLDIFFDRIVERPARAMETERS
-DESCRIPTOR.message_types_by_name['ComplDiff2DriverParameters'] = _COMPLDIFF2DRIVERPARAMETERS
+DESCRIPTOR.message_types_by_name['PreprocDriverParameters'] = _PREPROCDRIVERPARAMETERS
 
 class DriverParameters(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
@@ -560,35 +362,17 @@ class OracleDriverParameters(message.Message):
   
   # @@protoc_insertion_point(class_scope:les.drivers.OracleDriverParameters)
 
-class ComparisonDriverParameters(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _COMPARISONDRIVERPARAMETERS
-  
-  # @@protoc_insertion_point(class_scope:les.drivers.ComparisonDriverParameters)
-
-class SimpleDriverParameters(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _SIMPLEDRIVERPARAMETERS
-  
-  # @@protoc_insertion_point(class_scope:les.drivers.SimpleDriverParameters)
-
 class GreedyDriverParameters(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _GREEDYDRIVERPARAMETERS
   
   # @@protoc_insertion_point(class_scope:les.drivers.GreedyDriverParameters)
 
-class ComplDiffDriverParameters(message.Message):
+class PreprocDriverParameters(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _COMPLDIFFDRIVERPARAMETERS
+  DESCRIPTOR = _PREPROCDRIVERPARAMETERS
   
-  # @@protoc_insertion_point(class_scope:les.drivers.ComplDiffDriverParameters)
-
-class ComplDiff2DriverParameters(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _COMPLDIFF2DRIVERPARAMETERS
-  
-  # @@protoc_insertion_point(class_scope:les.drivers.ComplDiff2DriverParameters)
+  # @@protoc_insertion_point(class_scope:les.drivers.PreprocDriverParameters)
 
 driver_parameters.message_type = _DRIVERPARAMETERS
 les.mp_model.mp_model_pb2.OptimizationParameters.RegisterExtension(driver_parameters)

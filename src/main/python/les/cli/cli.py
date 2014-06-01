@@ -22,7 +22,7 @@ from les.cli import commands
 from les.cli.commands import command_base
 from les.utils import logging
 
-DEFAULT_LOGGING_LEVEL = "ERROR" # INFO
+DEFAULT_LOGGING_LEVEL = "INFO"
 
 EPILOG = ('Post bug reports and suggestions to ' +
           '<https://github.com/d2rk/les/issues>.')

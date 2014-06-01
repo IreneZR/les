@@ -26,4 +26,5 @@ enum BackendSolver {
   LP_SOLVE = 4;  // http://lpsolve.sourceforge.net/
   SCIP = 5;  // http://scip.zib.de/
   SYMPHONY = 6;  // https://projects.coin-or.org/SYMPHONY/
+  KNAPSACK_01_SOLVER = 7;
 };

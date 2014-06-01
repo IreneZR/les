@@ -18,6 +18,7 @@ from les.utils import logging
 from les.backend_solvers import backend_solvers_pb2
 
 from les.backend_solvers.knapsack_solver import fractional_knapsack_solver
+from les.backend_solvers.knapsack_solver import knapsack_01_solver
 try:
   from les.backend_solvers import scip
 except ImportError, e:
@@ -29,6 +30,8 @@ _SOLVERS_TABLE = {}
 SCIP_ID = backend_solvers_pb2.SCIP
 FRAKTIONAL_KNAPSACK_SOLVER_ID = getattr(backend_solvers_pb2,
                                         'FRAKTIONAL_KNAPSACK_SOLVER')
+KNAPSACK_01_SOLVER_ID = getattr(backend_solvers_pb2,
+                                        'KNAPSACK_01_SOLVER')
 
 _DEFAULT_SOLVERS_TABLE = {}
 if 'les.backend_solvers.scip' in sys.modules:
@@ -37,6 +40,7 @@ _SOLVERS_TABLE.update(_DEFAULT_SOLVERS_TABLE)
 
 _RELAXATION_SOLVERS_TABLE = {
   FRAKTIONAL_KNAPSACK_SOLVER_ID: fractional_knapsack_solver.FractionalKnapsackSolver,
+  KNAPSACK_01_SOLVER_ID: knapsack_01_solver.Knapsack01Solver,
 }
 _SOLVERS_TABLE.update(_RELAXATION_SOLVERS_TABLE)
 

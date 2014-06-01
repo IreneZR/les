@@ -68,6 +68,6 @@ class Optimize(command_base.CommandBase):
     model.optimize(params)
     file = sys.stdout
     file.write("Objective value: %f\n" % model.get_objective_value())
-    #file.write("Variables:\n")
-    #for i in range(model.get_num_columns()):
-    #  file.write("%15s = %f\n" % (model.columns_names[i], model.columns_values[i]))
+    file.write("Variables:\n")
+    for i in range(model.get_num_columns()):
+      file.write("%15s = %f\n" % (model.columns_names[i], model.columns_values[i]))

@@ -26,11 +26,8 @@ import "les/solution_tables/solution_tables.proto";
 enum Driver {
   LOCAL_ELIMINATION_DRIVER = 0;
   ORACLE_DRIVER = 1;
-  COMPARISON_DRIVER = 2;
-  SIMPLE_DRIVER = 3;
-  GREEDY_DRIVER = 4;
-  COMPL_DIFF_DRIVER = 5;
-  COMPL_DIFF2_DRIVER = 6;
+  GREEDY_DRIVER = 2;
+  PREPROC_DRIVER = 3;
 }
 
 message DriverParameters {
@@ -41,11 +38,8 @@ message DriverParameters {
   // Driver parameters extensions...
   optional LocalEliminationDriverParameters local_elimination_driver_parameters = 3;
   optional OracleDriverParameters oracle_driver_parameters = 4;
-  optional ComparisonDriverParameters comparison_driver_parameters = 5;
-  optional SimpleDriverParameters simple_driver_parameters = 6;
-  optional GreedyDriverParameters greedy_driver_parameters = 7;
-  optional ComplDiffDriverParameters compl_diff_driver_parameters = 8;
-  optional ComplDiffDriverParameters compl_diff2_driver_parameters = 9;
+  optional GreedyDriverParameters greedy_driver_parameters = 5;
+  optional PreprocDriverParameters preproc_driver_parameters = 6;
 }
 
 message LocalEliminationDriverParameters {
@@ -68,26 +62,6 @@ message OracleDriverParameters {
   repeated les.backend_solvers.BackendSolver relaxation_backend_solvers = 4;
 }
 
-message ComparisonDriverParameters {
-  // Max number of shared variables between two subproblems. In the worst case
-  // this driver will have to solve 2**max_num_shared_variables problems.
-  optional int64 max_num_shared_variables = 1 [default = 10];
-  optional les.decomposers.Decomposer decomposer = 2 [default = QUASIBLOCK_FINKELSTEIN_DECOMPOSER];
-  optional les.solution_tables.SolutionTable solution_table = 3 [default = SQLITE_SOLUTION_TABLE];
-  // A list of relaxations that will be applied one by one.
-  repeated les.backend_solvers.BackendSolver relaxation_backend_solvers = 4;
-}
-
-message SimpleDriverParameters {
-  // Max number of shared variables between two subproblems. In the worst case
-  // this driver will have to solve 2**max_num_shared_variables problems.
-  optional int64 max_num_shared_variables = 1 [default = 10];
-  optional les.decomposers.Decomposer decomposer = 2 [default = QUASIBLOCK_FINKELSTEIN_DECOMPOSER];
-  optional les.solution_tables.SolutionTable solution_table = 3 [default = SQLITE_SOLUTION_TABLE];
-  // A list of relaxations that will be applied one by one.
-  repeated les.backend_solvers.BackendSolver relaxation_backend_solvers = 4;
-}
-
 message GreedyDriverParameters {
   // Max number of shared variables between two subproblems. In the worst case
   // this driver will have to solve 2**max_num_shared_variables problems.
@@ -98,17 +72,7 @@ message GreedyDriverParameters {
   repeated les.backend_solvers.BackendSolver relaxation_backend_solvers = 4;
 }
 
-message ComplDiffDriverParameters {
-  // Max number of shared variables between two subproblems. In the worst case
-  // this driver will have to solve 2**max_num_shared_variables problems.
-  optional int64 max_num_shared_variables = 1 [default = 10];
-  optional les.decomposers.Decomposer decomposer = 2 [default = QUASIBLOCK_FINKELSTEIN_DECOMPOSER];
-  optional les.solution_tables.SolutionTable solution_table = 3 [default = SQLITE_SOLUTION_TABLE];
-  // A list of relaxations that will be applied one by one.
-  repeated les.backend_solvers.BackendSolver relaxation_backend_solvers = 4;
-}
-
-message ComplDiff2DriverParameters {
+message PreprocDriverParameters {
   // Max number of shared variables between two subproblems. In the worst case
   // this driver will have to solve 2**max_num_shared_variables problems.
   optional int64 max_num_shared_variables = 1 [default = 10];
